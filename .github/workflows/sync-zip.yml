@@ -1,0 +1,63 @@
+
+name: Sync RetroMusicPlayer ZIP
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-retromusicplayer
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download source ZIP
+        run: |
+          curl -fL \
+            "https://github.com/RetroMusicPlayer/RetroMusicPlayer/archive/refs/heads/dev.zip" \
+            -o source.zip
+
+      - name: Extract ZIP
+        run: |
+          unzip -q source.zip
+          SOURCE_DIR=$(find . -maxdepth 1 -type d \
+            -name 'RetroMusicPlayer-*' -print -quit)
+
+          if [ -z "$SOURCE_DIR" ]; then
+            echo "Source directory not found!"
+            exit 1
+          fi
+
+          echo "SOURCE_DIR=$SOURCE_DIR" >> "$GITHUB_ENV"
+
+      - name: Update repository files
+        run: |
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/' \
+            "$SOURCE_DIR"/ ./
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+          else
+            git commit -m "Update RetroMusicPlayer from upstream dev"
+            git push
+          fi
