@@ -1,6 +1,11 @@
 package code.name.monkey.retromusic.fragments.player
 
 import android.content.SharedPreferences
+import android.graphics.Outline
+import android.view.Gravity
+import android.view.ViewOutlineProvider
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -18,6 +23,7 @@ import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
 import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
 import code.name.monkey.retromusic.lyrics.LyricsDocumentLoader
 import code.name.monkey.retromusic.lyrics.LyricsSurface
+import code.name.monkey.retromusic.lyrics.LyricsPreferences
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import kotlinx.coroutines.Job
@@ -31,11 +37,14 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     private val binding get() = _binding!!
     private val lyricsView: KaraokeLyricsView get() = binding.lyricsView
     private var lyricsLoadJob: Job? = null
+    private var artworkBoundsRoot: View? = null
+    private var artworkBoundsObserver: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCoverLyricsBinding.bind(view)
         progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
+        attachArtworkBoundsTracking()
 
         if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.Fit ||
             PreferenceUtil.nowPlayingScreen == NowPlayingScreen.Full
@@ -62,8 +71,8 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
 
     fun setColors(color: MediaNotificationProcessor) {
         if (_binding == null) return
-        binding.playerLyrics.background = null
         lyricsView.setTextColors(color.primaryTextColor, color.secondaryTextColor)
+        updateLyricsBounds()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
@@ -98,12 +107,84 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         if (PreferenceUtil.showLyrics) updateLyrics()
     }
 
+    private fun attachArtworkBoundsTracking() {
+        val watchView = parentFragment?.view ?: binding.root.rootView
+        artworkBoundsRoot = watchView
+        val observer = ViewTreeObserver.OnGlobalLayoutListener {
+            updateLyricsBounds()
+        }
+        artworkBoundsObserver = observer
+        watchView.viewTreeObserver.addOnGlobalLayoutListener(observer)
+        binding.root.post { updateLyricsBounds() }
+    }
+
+    private fun findCurrentArtworkView(): View? {
+        val owner = when (val parent = parentFragment) {
+            is PlayerAlbumCoverFragment -> parent
+            else -> parent?.childFragmentManager
+                ?.findFragmentById(R.id.playerAlbumCoverFragment) as? PlayerAlbumCoverFragment
+        }
+        return owner?.currentArtworkView()
+            ?: parentFragment?.view?.findViewById(R.id.player_image)
+            ?: binding.root.rootView.findViewById(R.id.player_image)
+    }
+
+    /**
+     * Over Cover must use the actual player_image bounds. The host player slot
+     * is often taller than the square artwork, so filling the slot lets lyrics
+     * escape above and below the cover.
+     */
+    private fun updateLyricsBounds() {
+        if (_binding == null) return
+        val artwork = findCurrentArtworkView() ?: return
+        if (artwork.width <= 0 || artwork.height <= 0) return
+
+        val rootLocation = IntArray(2)
+        val artworkLocation = IntArray(2)
+        binding.root.getLocationOnScreen(rootLocation)
+        artwork.getLocationOnScreen(artworkLocation)
+
+        val left = artworkLocation[0] - rootLocation[0]
+        val top = artworkLocation[1] - rootLocation[1]
+        val params = binding.playerLyrics.layoutParams as? FrameLayout.LayoutParams
+            ?: FrameLayout.LayoutParams(artwork.width, artwork.height)
+        val changed = params.width != artwork.width ||
+            params.height != artwork.height ||
+            params.leftMargin != left ||
+            params.topMargin != top
+
+        if (changed) {
+            params.width = artwork.width
+            params.height = artwork.height
+            params.gravity = Gravity.TOP or Gravity.START
+            params.leftMargin = left
+            params.topMargin = top
+            binding.playerLyrics.layoutParams = params
+        }
+
+        val artworkContainer = artwork.parent as? View
+        binding.playerLyrics.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                val parentProvider = artworkContainer?.outlineProvider
+                if (artworkContainer != null && parentProvider != null) {
+                    parentProvider.getOutline(artworkContainer, outline)
+                } else {
+                    val radius = 12f * resources.displayMetrics.density
+                    outline.setRoundRect(0, 0, view.width, view.height, radius)
+                }
+            }
+        }
+        binding.playerLyrics.clipToOutline = true
+        binding.playerLyrics.clipChildren = true
+        binding.playerLyrics.clipToPadding = true
+    }
+
     private fun updateLyrics() {
         val song = MusicPlayerRemote.currentSong
         lyricsLoadJob?.cancel()
         lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
             val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            val translationRequested = LyricsPreferences.isTranslationEnabled(requireContext(), song)
             lyricsView.setTranslationStatus(
                 if (translationRequested) getString(R.string.lyrics_translation_loading) else null
             )
@@ -148,6 +229,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             progressViewUpdateHelper?.start()
             updateLyrics()
         }
+        updateLyricsBounds()
     }
 
     override fun onPause() {
@@ -161,6 +243,12 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             .unregisterOnSharedPreferenceChangeListener(this)
         lyricsLoadJob?.cancel()
         progressViewUpdateHelper?.stop()
+        artworkBoundsObserver?.let { observer ->
+            artworkBoundsRoot?.viewTreeObserver?.takeIf { it.isAlive }
+                ?.removeOnGlobalLayoutListener(observer)
+        }
+        artworkBoundsObserver = null
+        artworkBoundsRoot = null
         _binding = null
     }
 }
