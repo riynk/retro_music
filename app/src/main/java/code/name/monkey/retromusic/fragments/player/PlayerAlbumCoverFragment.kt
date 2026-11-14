@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import code.name.monkey.appthemehelper.util.ColorUtil
@@ -105,6 +106,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
     }
     private var progressViewUpdateHelper: MusicProgressViewUpdateHelper? = null
     private var lyricsLoadJob: Job? = null
+    private var lyricsLoadRequest = 0
 
     private val lrcView: KaraokeLyricsView get() = binding.lyricsView
 
@@ -119,40 +121,73 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
     }
 
     private fun updateLyrics() {
-        val song = MusicPlayerRemote.currentSong
+        val currentSong = MusicPlayerRemote.currentSong
+        val requestId = ++lyricsLoadRequest
         lyricsLoadJob?.cancel()
-        lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val translationRequested = LyricsPreferences.isTranslationEnabled(requireContext(), song)
-            lrcView.setTranslationStatus(
-                if (translationRequested) getString(R.string.lyrics_translation_loading) else null
-            )
-            val loaded = runCatching {
-                LyricsDocumentLoader.load(requireContext(), song)
-            }.getOrNull()
 
-            if (_binding == null) return@launch
+        // Clear the previous track immediately so its timestamps cannot follow the next song.
+        lrcView.clearDocument()
+        val context = requireContext()
+        val translationRequested =
+            LyricsPreferences.isTranslationEnabled(context, currentSong)
+        lrcView.setTranslationStatus(
+            if (translationRequested) getString(R.string.lyrics_translation_loading) else null
+        )
+
+        lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val document = try {
+                LyricsDocumentLoader.loadDocument(context, currentSong)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            }
+
+            if (!isCurrentLyricsRequest(requestId, currentSong.id)) return@launch
             lrcView.setStyle(
-                LyricsDisplaySettings.read(requireContext(), LyricsSurface.REPLACE_COVER)
+                LyricsDisplaySettings.read(context, LyricsSurface.REPLACE_COVER)
             )
-            if (loaded == null) {
+
+            if (document == null) {
                 lrcView.setTranslationStatus(null)
                 lrcView.setEmptyMessage(getString(R.string.no_lyrics_found))
-            } else {
-                lrcView.setTranslationStatus(
-                    if (loaded.translationFailed) getString(R.string.lyrics_translation_failed) else null
+                return@launch
+            }
+
+            val showWordHighlight = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("lyrics_word_highlight", true)
+            lrcView.setDocument(document, null, showWordHighlight)
+
+            if (!translationRequested) {
+                lrcView.setTranslationStatus(null)
+                return@launch
+            }
+
+            try {
+                val translations = LyricsDocumentLoader.translate(
+                    context,
+                    currentSong,
+                    document
                 )
-                val showWordHighlight = PreferenceManager.getDefaultSharedPreferences(
-                    requireContext()
-                ).getBoolean("lyrics_word_highlight", true)
-                lrcView.setDocument(
-                    loaded.document,
-                    loaded.translations,
-                    showWordHighlight
-                )
+                if (!isCurrentLyricsRequest(requestId, currentSong.id)) return@launch
+                lrcView.setDocument(document, translations, showWordHighlight)
+                lrcView.setTranslationStatus(null)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                if (isCurrentLyricsRequest(requestId, currentSong.id)) {
+                    lrcView.setTranslationStatus(
+                        getString(R.string.lyrics_translation_failed)
+                    )
+                }
             }
         }
     }
+
+    private fun isCurrentLyricsRequest(requestId: Int, songId: Long): Boolean =
+        _binding != null &&
+            requestId == lyricsLoadRequest &&
+            songId == MusicPlayerRemote.currentSong.id
 
     override fun onUpdateProgressViews(progress: Int, total: Int) {
         if (_binding == null) return
@@ -222,6 +257,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
         PreferenceManager.getDefaultSharedPreferences(requireContext())
             .unregisterOnSharedPreferenceChangeListener(this)
         binding.viewPager.removeOnPageChangeListener(this)
+        lyricsLoadRequest++
         lyricsLoadJob?.cancel()
         progressViewUpdateHelper?.stop()
         _binding = null
@@ -346,7 +382,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
                 setLRCViewColors(primaryColor, secondaryColor)
             }
             Color, Classic -> setLRCViewColors(color.primaryTextColor, color.secondaryTextColor)
-            Blur, PlainBlur, PlainAtmosphere -> setLRCViewColors(
+            Blur, PlainAtmosphere -> setLRCViewColors(
                 android.graphics.Color.WHITE,
                 ColorUtil.withAlpha(android.graphics.Color.WHITE, 0.5f)
             )

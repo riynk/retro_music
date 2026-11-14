@@ -675,6 +675,8 @@ object PreferenceUtil {
     var nowPlayingScreen: NowPlayingScreen
         get() {
             val id: Int = sharedPreferences.getInt(NOW_PLAYING_SCREEN_ID, 0)
+            // Plain Blur was briefly exposed as a duplicate theme; migrate its saved ID.
+            if (id == 19) return NowPlayingScreen.PlainAtmosphere
             for (nowPlayingScreen in NowPlayingScreen.values()) {
                 if (nowPlayingScreen.id == id) {
                     return nowPlayingScreen

@@ -216,7 +216,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     private fun updateLyricsBackground() {
         if (_binding == null) return
-        val enabled = (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur || PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)
+        val enabled = (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)
         binding.lyricsBackground.isVisible = enabled
         binding.lyricsBackgroundScrim.isVisible = enabled
         if (!enabled) return
@@ -300,7 +300,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lyrics, menu)
         refreshLyricsMenu()
-        if ((PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur || PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)) {
+        if ((PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)) {
             ToolbarContentTintHelper.colorizeToolbar(binding.toolbar, Color.WHITE, requireActivity())
         } else {
             ToolbarContentTintHelper.handleOnCreateOptionsMenu(
