@@ -177,12 +177,14 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onPlayingMetaChanged() {
         super.onPlayingMetaChanged()
         updateTitleSong()
+        refreshLyricsMenu()
         loadLyrics()
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         updateTitleSong()
+        refreshLyricsMenu()
         loadLyrics()
     }
 
@@ -198,6 +200,15 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         }
     }
 
+    private fun refreshLyricsMenu() {
+        val menu = binding.toolbar.menu
+        menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
+            LyricsPreferences.isTranslationEnabled(requireContext(), song)
+        menu.findItem(R.id.action_choose_lyrics_source)?.title =
+            getString(R.string.action_choose_lyrics_source) + " — " +
+                getString(LyricsPreferences.source(requireContext(), song).titleRes)
+    }
+
     private fun setupWakelock() {
         if (PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("screen_on_lyrics", false)
@@ -207,11 +218,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lyrics, menu)
-        menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
-            LyricsPreferences.isTranslationEnabled(requireContext(), song)
-        menu.findItem(R.id.action_choose_lyrics_source)?.title =
-            getString(R.string.action_choose_lyrics_source) + " — " +
-                getString(LyricsPreferences.source(requireContext(), song).titleRes)
+        refreshLyricsMenu()
         ToolbarContentTintHelper.handleOnCreateOptionsMenu(
             requireContext(),
             binding.toolbar,
@@ -461,6 +468,8 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     override fun onResume() {
         super.onResume()
+        updateTitleSong()
+        refreshLyricsMenu()
         updateHelper.start()
         // Refresh lyric display settings when returning from Settings.
         loadLyrics()
