@@ -25,6 +25,8 @@ import code.name.monkey.retromusic.lyrics.model.LyricLine
 import code.name.monkey.retromusic.lyrics.model.LyricWord
 import kotlin.math.roundToInt
 
+private const val TTML_INACTIVE_TEXT_COLOR = 0x66FFFFFF
+
 /**
  * Shared karaoke renderer for Replace Cover, Over Cover and the full lyrics page.
  * Timed TTML/LRC segments are progressively filled during their actual time
@@ -111,7 +113,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
         secondaryTextColor = secondaryColor
         if (accentColor != null) accentTextColor = accentColor
         document?.let { renderLines(it, currentLine) }
-        translationStatusView?.setTextColor(secondaryTextColor)
+        translationStatusView?.setTextColor(
+            inactiveTextColor(document?.sourceFormat.equals("ttml", ignoreCase = true))
+        )
     }
 
     fun setTranslationStatus(message: String?) {
@@ -258,6 +262,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
         val hasProgressiveHighlight =
             active && highlightWords && line.words.isNotEmpty()
         val isTtml = document?.sourceFormat.equals("ttml", ignoreCase = true)
+        val inactiveColor = inactiveTextColor(isTtml)
 
         lyric.animate().cancel()
         lyric.setTextSize(
@@ -281,11 +286,11 @@ class KaraokeLyricsView @JvmOverloads constructor(
         // LRC keeps its established theme-aware primary/accent treatment.
         lyric.setTextColor(
             when {
-                hasProgressiveHighlight && isTtml -> secondaryTextColor
+                hasProgressiveHighlight && isTtml -> inactiveColor
                 hasProgressiveHighlight -> activeKaraokeBaseColor()
                 active && isTtml -> Color.WHITE
                 active -> primaryTextColor
-                else -> secondaryTextColor
+                else -> inactiveColor
             }
         )
         lyric.text = if (active) highlightedText(line, isTtml) else line.text
@@ -305,7 +310,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
             )
             subtitle.typeface = resolveTypeface(style.fontFamily)
             subtitle.gravity = alignmentGravity()
-            subtitle.setTextColor(secondaryTextColor)
+            subtitle.setTextColor(inactiveColor)
         }
 
         if (compact) {
@@ -364,6 +369,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
         }
     }
 
+    private fun inactiveTextColor(isTtml: Boolean): Int =
+        if (isTtml) TTML_INACTIVE_TEXT_COLOR else secondaryTextColor
+
     private fun activeKaraokeBaseColor(): Int =
         blendColors(primaryTextColor, secondaryTextColor, 0.45f)
 
@@ -398,7 +406,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
                     ProgressiveLyricsSpan(
                         word = word,
                         positionProvider = { currentPositionMs },
-                        baseColor = if (isTtml) secondaryTextColor else activeKaraokeBaseColor(),
+                        baseColor = if (isTtml) inactiveTextColor(true) else activeKaraokeBaseColor(),
                         highlightColor = if (isTtml) Color.WHITE else accentTextColor
                     ),
                     start,
@@ -420,7 +428,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
             gravity = alignmentGravity()
             typeface = resolveTypeface(style.fontFamily)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            setTextColor(secondaryTextColor)
+            setTextColor(
+                inactiveTextColor(document?.sourceFormat.equals("ttml", ignoreCase = true))
+            )
             alpha = 0.9f
             setPadding(dp(12), dp(8), dp(12), dp(12))
             isClickable = translationRetryListener != null
