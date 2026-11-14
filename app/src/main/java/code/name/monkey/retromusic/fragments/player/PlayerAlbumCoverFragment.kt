@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
@@ -64,6 +65,35 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
     private var callbacks: Callbacks? = null
     private var currentPosition: Int = 0
     val viewPager get() = binding.viewPager
+
+    /**
+     * Returns the artwork view belonging to the currently centred pager page.
+     * Over-cover lyrics use these exact bounds instead of the taller player slot.
+     */
+    fun currentArtworkView(): View? {
+        val pager = _binding?.viewPager ?: return null
+        val candidates = ArrayList<View>()
+
+        fun collect(view: View) {
+            if (view.id == R.id.player_image) candidates += view
+            if (view is ViewGroup) {
+                for (index in 0 until view.childCount) collect(view.getChildAt(index))
+            }
+        }
+
+        collect(pager)
+        val pagerLocation = IntArray(2)
+        pager.getLocationOnScreen(pagerLocation)
+        val pagerCenter = pagerLocation[0] + pager.width / 2f
+
+        return candidates
+            .filter { it.isShown && it.width > 0 && it.height > 0 }
+            .minByOrNull { artwork ->
+                val location = IntArray(2)
+                artwork.getLocationOnScreen(location)
+                kotlin.math.abs(location[0] + artwork.width / 2f - pagerCenter)
+            }
+    }
 
     private val colorReceiver = object : AlbumCoverFragment.ColorReceiver {
         override fun onColorReady(color: MediaNotificationProcessor, request: Int) {

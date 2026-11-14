@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/playerLyrics"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:alpha="1"
-    android:background="@drawable/lyrics_mask"
-    android:clipToPadding="false"
-    android:elevation="20dp"
-    android:padding="16dp"
-    android:visibility="gone"
-    tools:alpha="1"
-    tools:visibility="visible">
+    android:clipChildren="true"
+    android:clipToPadding="true">
 
-    <code.name.monkey.retromusic.lyrics.KaraokeLyricsView
-        android:id="@+id/lyricsView"
+    <FrameLayout
+        android:id="@+id/playerLyrics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:overScrollMode="never" />
+        android:alpha="1"
+        android:clipChildren="true"
+        android:clipToPadding="true"
+        android:elevation="20dp"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:alpha="1"
+        tools:visibility="visible">
+
+        <View
+            android:id="@+id/artworkDim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#38000000"
+            android:importantForAccessibility="no" />
+
+        <code.name.monkey.retromusic.lyrics.KaraokeLyricsView
+            android:id="@+id/lyricsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:overScrollMode="never" />
+    </FrameLayout>
 </FrameLayout>
