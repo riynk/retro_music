@@ -264,11 +264,6 @@
     <string name="pick_from_local_storage">Pilih dari penyimpanan lokal</string>
     <string name="pinterest_page">Pinterest</string>
     <string name="pinterest_page_summary">Ikuti halaman Pinterest untuk inspirasi desain Retro Music</string>
-    <string name="plain_blur">Polos Buram</string>
-    <string name="pref_plain_blur_background_source">Latar Plain Blur</string>
-    <string name="pref_plain_blur_background_summary">Pilih gambar untuk latar buram di Plain Blur dan halaman lirik.</string>
-    <string name="plain_blur_background_album">Artwork lagu (metadata)</string>
-    <string name="plain_blur_background_artist">Gambar artis</string>
     <string name="plain">Polos</string>
     <string name="playback_pitch">Nada</string>
     <string name="playback_settings">Setelan Pemutaran</string>
