@@ -214,7 +214,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     private fun updateLyricsBackground() {
         if (_binding == null) return
-        val enabled = PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur
+        val enabled = (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur || PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)
         binding.lyricsBackground.isVisible = enabled
         binding.lyricsBackgroundScrim.isVisible = enabled
         if (!enabled) return
@@ -298,7 +298,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lyrics, menu)
         refreshLyricsMenu()
-        if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur) {
+        if ((PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur || PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)) {
             ToolbarContentTintHelper.colorizeToolbar(binding.toolbar, Color.WHITE, requireActivity())
         } else {
             ToolbarContentTintHelper.handleOnCreateOptionsMenu(
@@ -510,7 +510,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                     loaded.translations,
                     preferences.getBoolean("lyrics_word_highlight", true)
                 )
-                if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur) {
+                if ((PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur || PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)) {
                     binding.karaokeLyricsView.setTextColors(
                         Color.WHITE,
                         0xB3FFFFFF.toInt(),

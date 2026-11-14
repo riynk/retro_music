@@ -46,4 +46,5 @@ enum class NowPlayingScreen constructor(
     Simple(R.string.simple, R.drawable.np_simple, 8, AlbumCoverStyle.Normal),
     Tiny(R.string.tiny, R.drawable.np_tiny, 7, null),
     PlainBlur(R.string.plain_blur, R.drawable.np_plain, 19, AlbumCoverStyle.Normal),
+    PlainAtmosphere(R.string.plain_atmosphere, R.drawable.np_plain, 20, AlbumCoverStyle.Normal),
 }
