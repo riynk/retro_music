@@ -360,6 +360,7 @@
     <string name="pref_title_lock_screen">Fullscreen controls</string>
     <string name="pref_title_lyrics_screen_on">Keep screen on when showing lyrics</string>
     <string name="pref_title_lyrics_type">Lyrics type</string>
+    <string name="pref_summary_lyrics_type">Replace Cover hides the album artwork and uses lyrics in its place. Over Cover keeps the artwork visible with lyrics layered on top.</string>
     <string name="pref_title_manage_audio_focus">Always play</string>
     <string name="pref_title_now_playing_screen_appearance">Now playing theme</string>
     <string name="pref_title_open_source_licences">Open source licences</string>
