@@ -129,6 +129,7 @@
         android:title="@string/pref_header_lockscreen">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_image"
             android:defaultValue="true"
             android:key="album_art_on_lock_screen"
             android:layout="@layout/list_item_view_switch"
