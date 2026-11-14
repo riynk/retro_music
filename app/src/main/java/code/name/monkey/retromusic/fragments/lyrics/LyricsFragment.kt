@@ -41,6 +41,7 @@ import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
 import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
 import code.name.monkey.retromusic.lyrics.translation.LyricsTranslationCache
 import code.name.monkey.retromusic.lyrics.translation.MlKitLyricsTranslator
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
@@ -108,6 +109,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     private lateinit var updateHelper: MusicProgressViewUpdateHelper
     private var lyricsLoadJob: Job? = null
+    private var lyricsLoadRequest = 0
     private var lyricsBackgroundRequest = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -485,55 +487,97 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     private fun loadLyrics() {
         if (_binding == null) return
+        val requestId = ++lyricsLoadRequest
         lyricsLoadJob?.cancel()
         val currentSong = song
+
         lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val translationRequested = LyricsPreferences.isTranslationEnabled(requireContext(), currentSong)
+            val context = requireContext()
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val translationRequested =
+                LyricsPreferences.isTranslationEnabled(context, currentSong)
+
+            // Remove the previous song before loading the new local lyric document.
+            binding.karaokeLyricsView.clearDocument()
             binding.karaokeLyricsView.setTranslationStatus(
                 if (translationRequested) getString(R.string.lyrics_translation_loading) else null
             )
-            val loaded = runCatching {
-                LyricsDocumentLoader.load(requireContext(), currentSong)
-            }.getOrNull()
-            if (_binding == null) return@launch
+            binding.karaokeLyricsView.isVisible = true
+            binding.lyricsView.isVisible = false
+            binding.normalLyrics.isVisible = false
+            binding.noLyricsFound.isVisible = false
+            binding.editButton.isVisible = false
 
-            if (loaded != null) {
+            val document = try {
+                LyricsDocumentLoader.loadDocument(context, currentSong)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            }
+            if (!isCurrentLyricsRequest(requestId, currentSong)) return@launch
+
+            if (document != null) {
                 binding.karaokeLyricsView.setStyle(
-                    LyricsDisplaySettings.read(requireContext(), LyricsSurface.FULL_PAGE)
+                    LyricsDisplaySettings.read(context, LyricsSurface.FULL_PAGE)
                 )
-                binding.karaokeLyricsView.setTranslationStatus(
-                    if (loaded.translationFailed) getString(R.string.lyrics_translation_failed) else null
-                )
-                binding.karaokeLyricsView.setDocument(
-                    loaded.document,
-                    loaded.translations,
-                    preferences.getBoolean("lyrics_word_highlight", true)
-                )
-                if ((PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur || PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere)) {
+                if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere) {
+                    // Keep the existing LRC theme palette. TTML applies its own
+                    // dim/white two-colour palette in KaraokeLyricsView.
                     binding.karaokeLyricsView.setTextColors(
                         Color.WHITE,
                         0xB3FFFFFF.toInt(),
                         accentColor()
                     )
                 }
+
+                val highlightWords = preferences.getBoolean("lyrics_word_highlight", true)
+                // Do not wait for ML Kit to finish its model download before showing lyrics.
+                binding.karaokeLyricsView.setDocument(document, null, highlightWords)
                 setLyricsSourceSubtitle(
-                    loaded.document.sourceFormat,
-                    loaded.document.hasWordTiming
+                    document.sourceFormat,
+                    document.hasWordTiming
                 )
                 binding.karaokeLyricsView.isVisible = true
                 binding.lyricsView.isVisible = false
                 binding.normalLyrics.isVisible = false
                 binding.noLyricsFound.isVisible = false
-                binding.editButton.isVisible = loaded.document.sourceFormat != "ttml"
-                lyricsType = if (loaded.document.sourceFormat == "ttml") {
+                binding.editButton.isVisible = document.sourceFormat != "ttml"
+                lyricsType = if (document.sourceFormat == "ttml") {
                     LyricsType.ADVANCED_LYRICS
                 } else LyricsType.SYNCED_LYRICS
+
+                if (translationRequested) {
+                    try {
+                        val translations = LyricsDocumentLoader.translate(
+                            context,
+                            currentSong,
+                            document
+                        )
+                        if (!isCurrentLyricsRequest(requestId, currentSong)) return@launch
+                        binding.karaokeLyricsView.setDocument(
+                            document,
+                            translations,
+                            highlightWords
+                        )
+                        binding.karaokeLyricsView.setTranslationStatus(null)
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (_: Exception) {
+                        if (isCurrentLyricsRequest(requestId, currentSong)) {
+                            binding.karaokeLyricsView.setTranslationStatus(
+                                getString(R.string.lyrics_translation_failed)
+                            )
+                        }
+                    }
+                } else {
+                    binding.karaokeLyricsView.setTranslationStatus(null)
+                }
                 return@launch
             }
 
             binding.karaokeLyricsView.setTranslationStatus(null)
-            if (LyricsPreferences.source(requireContext(), currentSong) == LyricsSource.TTML) {
+            if (LyricsPreferences.source(context, currentSong) == LyricsSource.TTML) {
                 setLyricsSourceSubtitle("ttml")
                 binding.karaokeLyricsView.setEmptyMessage(
                     getString(R.string.lyrics_source_ttml_missing)
@@ -546,6 +590,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                 lyricsType = LyricsType.ADVANCED_LYRICS
                 return@launch
             }
+
             binding.karaokeLyricsView.isVisible = false
             binding.editButton.isVisible = true
             val hasSyncedLrc = loadLRCLyrics()
@@ -562,6 +607,12 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
             }
         }
     }
+
+    private fun isCurrentLyricsRequest(requestId: Int, requestedSong: Song): Boolean =
+        _binding != null &&
+            requestId == lyricsLoadRequest &&
+            requestedSong.id == song.id &&
+            requestedSong.id == MusicPlayerRemote.currentSong.id
 
     override fun onResume() {
         super.onResume()
@@ -581,6 +632,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onDestroyView() {
         super.onDestroyView()
         lyricsBackgroundRequest++
+        lyricsLoadRequest++
         lyricsLoadJob?.cancel()
         lyricsLoadJob = null
         if (MusicPlayerRemote.playingQueue.isNotEmpty()) mainActivity.expandPanel()

@@ -29,6 +29,7 @@ import code.name.monkey.retromusic.lyrics.LyricsSurface
 import code.name.monkey.retromusic.lyrics.LyricsPreferences
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     private val binding get() = _binding!!
     private val lyricsView: KaraokeLyricsView get() = binding.lyricsView
     private var lyricsLoadJob: Job? = null
+    private var lyricsLoadRequest = 0
     private var artworkBoundsRoot: View? = null
     private var artworkBoundsObserver: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var dimmedArtwork: ImageView? = null
@@ -228,40 +230,74 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     }
 
     private fun updateLyrics() {
-        val song = MusicPlayerRemote.currentSong
+        val currentSong = MusicPlayerRemote.currentSong
+        val requestId = ++lyricsLoadRequest
         lyricsLoadJob?.cancel()
-        lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val translationRequested = LyricsPreferences.isTranslationEnabled(requireContext(), song)
-            lyricsView.setTranslationStatus(
-                if (translationRequested) getString(R.string.lyrics_translation_loading) else null
-            )
-            val loaded = runCatching {
-                LyricsDocumentLoader.load(requireContext(), song)
-            }.getOrNull()
 
-            if (_binding == null) return@launch
+        // Do not keep the previous track's timed lines attached to the new song.
+        lyricsView.clearDocument()
+        val context = requireContext()
+        val translationRequested =
+            LyricsPreferences.isTranslationEnabled(context, currentSong)
+        lyricsView.setTranslationStatus(
+            if (translationRequested) getString(R.string.lyrics_translation_loading) else null
+        )
+
+        lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val document = try {
+                LyricsDocumentLoader.loadDocument(context, currentSong)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            }
+
+            if (!isCurrentLyricsRequest(requestId, currentSong.id)) return@launch
             lyricsView.setStyle(
-                LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
+                LyricsDisplaySettings.read(context, LyricsSurface.OVER_COVER)
             )
-            if (loaded == null) {
+
+            if (document == null) {
                 lyricsView.setTranslationStatus(null)
                 lyricsView.setEmptyMessage(getString(R.string.no_lyrics_found))
-            } else {
-                lyricsView.setTranslationStatus(
-                    if (loaded.translationFailed) getString(R.string.lyrics_translation_failed) else null
+                return@launch
+            }
+
+            val showWordHighlight = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("lyrics_word_highlight", true)
+            // TTML/LRC is visible right away; translation is a separate slower step.
+            lyricsView.setDocument(document, null, showWordHighlight)
+
+            if (!translationRequested) {
+                lyricsView.setTranslationStatus(null)
+                return@launch
+            }
+
+            try {
+                val translations = LyricsDocumentLoader.translate(
+                    context,
+                    currentSong,
+                    document
                 )
-                val showWordHighlight = PreferenceManager.getDefaultSharedPreferences(
-                    requireContext()
-                ).getBoolean("lyrics_word_highlight", true)
-                lyricsView.setDocument(
-                    loaded.document,
-                    loaded.translations,
-                    showWordHighlight
-                )
+                if (!isCurrentLyricsRequest(requestId, currentSong.id)) return@launch
+                lyricsView.setDocument(document, translations, showWordHighlight)
+                lyricsView.setTranslationStatus(null)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                if (isCurrentLyricsRequest(requestId, currentSong.id)) {
+                    lyricsView.setTranslationStatus(
+                        getString(R.string.lyrics_translation_failed)
+                    )
+                }
             }
         }
     }
+
+    private fun isCurrentLyricsRequest(requestId: Int, songId: Long): Boolean =
+        _binding != null &&
+            requestId == lyricsLoadRequest &&
+            songId == MusicPlayerRemote.currentSong.id
 
     override fun onUpdateProgressViews(progress: Int, total: Int) {
         if (_binding == null) return
@@ -289,6 +325,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         super.onDestroyView()
         PreferenceManager.getDefaultSharedPreferences(requireContext())
             .unregisterOnSharedPreferenceChangeListener(this)
+        lyricsLoadRequest++
         lyricsLoadJob?.cancel()
         progressViewUpdateHelper?.stop()
         artworkBoundsObserver?.let { observer ->
