@@ -1,0 +1,89 @@
+
+name: Sync RetroMusicPlayer ZIP
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-retromusicplayer
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download source ZIP
+        run: |
+          mkdir -p "$RUNNER_TEMP/source"
+
+          curl -fL --retry 3 \
+            "https://github.com/RetroMusicPlayer/RetroMusicPlayer/archive/refs/heads/dev.zip" \
+            -o "$RUNNER_TEMP/source.zip"
+
+      - name: Extract ZIP
+        run: |
+          unzip -q "$RUNNER_TEMP/source.zip" \
+            -d "$RUNNER_TEMP/source"
+
+          SOURCE_DIR=$(find "$RUNNER_TEMP/source" \
+            -mindepth 1 -maxdepth 1 -type d -print -quit)
+
+          if [ -z "$SOURCE_DIR" ]; then
+            echo "ERROR: Source directory not found!"
+            exit 1
+          fi
+
+          echo "SOURCE_DIR=$SOURCE_DIR" >> "$GITHUB_ENV"
+
+      - name: Sync repository files
+        run: |
+          set +e
+
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/' \
+            "$SOURCE_DIR"/ ./
+
+          STATUS=$?
+
+          if [ "$STATUS" -eq 24 ]; then
+            echo "WARNING: Some files vanished. Retrying sync..."
+
+            rsync -a --delete \
+              --exclude='.git/' \
+              --exclude='.github/workflows/' \
+              "$SOURCE_DIR"/ ./
+
+            STATUS=$?
+          fi
+
+          if [ "$STATUS" -ne 0 ]; then
+            echo "ERROR: Sync failed with code $STATUS"
+            exit "$STATUS"
+          fi
+
+          echo "Sync completed successfully!"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "riynk"
+          git config user.email \
+            "riynkazis@gmail.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+          else
+            git commit -m "Update RetroMusicPlayer from upstream dev"
+            git push
+          fi
