@@ -154,7 +154,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         binding.editButton.accentColor()
         binding.editButton.setOnClickListener {
             when (lyricsType) {
-                LyricsType.SYNCED_LYRICS, LyricsType.ENHANCED_LYRICS -> {
+                LyricsType.SYNCED_LYRICS, LyricsType.ADVANCED_LYRICS -> {
                     editSyncedLyrics()
                 }
                 LyricsType.NORMAL_LYRICS -> {
@@ -370,7 +370,8 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                         ?.let { runCatching { it.readText() }.getOrNull() }
                         ?: LyricUtil.getEmbeddedSyncedLyrics(currentSong.data)
                     val document = lrcText?.let { LrcLyricsParser.parse(it) }
-                    if (document?.hasWordTiming == true) document to false else null
+                    // Standard LRC remains line-synchronized but can still be translated.
+                    document?.let { it to false }
                 }
             }
 
@@ -409,7 +410,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                 binding.normalLyrics.isVisible = false
                 binding.noLyricsFound.isVisible = false
                 binding.editButton.isVisible = !isTtml
-                lyricsType = LyricsType.ENHANCED_LYRICS
+                lyricsType = LyricsType.ADVANCED_LYRICS
                 return@launch
             }
 
@@ -450,6 +451,6 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     enum class LyricsType {
         NORMAL_LYRICS,
         SYNCED_LYRICS,
-        ENHANCED_LYRICS
+        ADVANCED_LYRICS
     }
 }
