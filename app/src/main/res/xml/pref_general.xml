@@ -46,6 +46,7 @@
         android:title="@string/colors">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_palette"
             android:defaultValue="false"
             android:key="wallpaper_accent"
             android:layout="@layout/list_item_view_switch"
