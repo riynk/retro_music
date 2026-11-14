@@ -231,7 +231,13 @@ class KaraokeLyricsView @JvmOverloads constructor(
             )
             lyric.typeface = resolveTypeface(style.fontFamily)
             lyric.gravity = alignmentGravity()
-            lyric.setTextColor(if (active) primaryTextColor else secondaryTextColor)
+            val hasProgressiveHighlight =
+                active && highlightWords && line.words.isNotEmpty()
+            // Keep the unfilled text subdued. The accent colour is the moving
+            // overlay; a white base makes that sweep almost impossible to see.
+            lyric.setTextColor(
+                if (active && !hasProgressiveHighlight) primaryTextColor else secondaryTextColor
+            )
             lyric.text = if (active) highlightedText(line) else line.text
 
             translationViews.getOrNull(index)?.let { subtitle ->
@@ -263,7 +269,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
             val start = word.startIndex.coerceIn(0, spannable.length)
             val end = word.endIndex.coerceIn(start, spannable.length)
             if (end > start) {
-                val unfilled = if (word.isBackground) secondaryTextColor else primaryTextColor
+                // TTML karaoke: draw a quiet base first, then fill it with
+                // the theme accent as playback crosses the timed word.
+                val unfilled = secondaryTextColor
                 spannable.setSpan(
                     ProgressiveLyricsSpan(
                         word = word,
