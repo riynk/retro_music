@@ -33,7 +33,7 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
     override fun invalidateSettings() {
         updateNowPlayingScreenSummary()
         updateAlbumCoverStyleSummary()
-        updatePlainBlurBackgroundVisibility()
+        updateAtmosphereBackgroundVisibility()
 
         val carouselEffect: TwoStatePreference? = findPreference(CAROUSEL_EFFECT)
         carouselEffect?.setOnPreferenceChangeListener { _, _ ->
@@ -45,9 +45,9 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
         addPreferencesFromResource(R.xml.pref_now_playing_screen)
     }
 
-    private fun updatePlainBlurBackgroundVisibility() {
+    private fun updateAtmosphereBackgroundVisibility() {
         findPreference<Preference>("plain_blur_background_source")?.isVisible =
-            PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur
+            PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere
     }
 
     private fun updateAlbumCoverStyleSummary() {
@@ -79,7 +79,7 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
         when (key) {
             NOW_PLAYING_SCREEN_ID -> {
                 updateNowPlayingScreenSummary()
-                updatePlainBlurBackgroundVisibility()
+                updateAtmosphereBackgroundVisibility()
             }
             ALBUM_COVER_STYLE -> updateAlbumCoverStyleSummary()
             CIRCULAR_ALBUM_ART, CAROUSEL_EFFECT -> invalidateSettings()

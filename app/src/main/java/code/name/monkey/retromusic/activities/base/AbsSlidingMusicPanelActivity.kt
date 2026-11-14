@@ -94,7 +94,6 @@ import code.name.monkey.retromusic.fragments.player.md3.MD3PlayerFragment
 import code.name.monkey.retromusic.fragments.player.normal.PlayerFragment
 import code.name.monkey.retromusic.fragments.player.peek.PeekPlayerFragment
 import code.name.monkey.retromusic.fragments.player.plain.PlainPlayerFragment
-import code.name.monkey.retromusic.fragments.player.plainblur.PlainBlurPlayerFragment
 import code.name.monkey.retromusic.fragments.player.plainatmosphere.PlainAtmospherePlayerFragment
 import code.name.monkey.retromusic.fragments.player.simple.SimplePlayerFragment
 import code.name.monkey.retromusic.fragments.player.tiny.TinyPlayerFragment
@@ -434,7 +433,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
             if (PreferenceUtil.isAdaptiveColor && (nowPlayingScreen == Normal || nowPlayingScreen == Flat || nowPlayingScreen == Material)) {
                 setLightNavigationBar(true)
                 setLightStatusBar(isColorLight)
-            } else if (nowPlayingScreen == Card || nowPlayingScreen == Blur || nowPlayingScreen == BlurCard || nowPlayingScreen == PlainBlur || nowPlayingScreen == PlainAtmosphere) {
+            } else if (nowPlayingScreen == Card || nowPlayingScreen == Blur || nowPlayingScreen == BlurCard || nowPlayingScreen == PlainAtmosphere) {
                 animateNavigationBarColor(android.graphics.Color.BLACK)
                 navigationBarColor = android.graphics.Color.BLACK
                 setLightStatusBar(false)
@@ -588,7 +587,6 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
             Flat -> FlatPlayerFragment()
             Full -> FullPlayerFragment()
             Plain -> PlainPlayerFragment()
-            PlainBlur -> PlainBlurPlayerFragment()
             PlainAtmosphere -> PlainAtmospherePlayerFragment()
             Simple -> SimplePlayerFragment()
             Material -> MaterialFragment()

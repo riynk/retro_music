@@ -15,8 +15,8 @@
         android:entryValues="@array/plain_blur_background_values"
         android:key="plain_blur_background_source"
         android:layout="@layout/list_item_view"
-        android:summary="@string/pref_plain_blur_background_summary"
-        android:title="@string/pref_plain_blur_background_source" />
+        android:summary="@string/pref_plain_atmosphere_background_summary"
+        android:title="@string/pref_plain_atmosphere_background_source" />
 
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
         android:icon="@drawable/ic_info_outline"

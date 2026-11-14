@@ -23,8 +23,8 @@
     </string-array>
 
     <array name="plain_blur_background_entries">
-        <item>@string/plain_blur_background_album</item>
-        <item>@string/plain_blur_background_artist</item>
+        <item>@string/plain_atmosphere_background_album</item>
+        <item>@string/plain_atmosphere_background_artist</item>
     </array>
     <string-array name="plain_blur_background_values">
         <item>album_art</item>
