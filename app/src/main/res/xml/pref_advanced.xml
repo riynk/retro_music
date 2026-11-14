@@ -7,10 +7,10 @@
         android:layout="@layout/list_item_view"
         android:summary="@string/pref_summary_blacklist"
         android:title="@string/pref_header_blacklist"
-        android:icon="@drawable/ic_music_note_off" />
+        app:icon="@drawable/ic_music_note_off" />
 
-    <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_library_music"s.supportv7.ATESwitchPreference
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_library_music"
         android:defaultValue="false"
         android:key="whitelist_music"
         android:layout="@layout/list_item_view_switch"
@@ -30,7 +30,7 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="@string/pref_title_last_added_interval"
-            android:icon="@drawable/ic_playlist_add" />
+            app:icon="@drawable/ic_playlist_add" />
 
     </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
@@ -44,7 +44,7 @@
             android:max="60"
             android:summary="@string/pref_filter_song_summary"
             android:title="@string/pref_filter_song_title"
-            android:icon="@drawable/ic_filter_song"
+            app:icon="@drawable/ic_filter_song"
             app:showSeekBarValue="true" />
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference

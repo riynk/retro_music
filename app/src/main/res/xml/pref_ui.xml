@@ -14,10 +14,10 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="@string/pref_title_home_artist_grid_style"
-            android:icon="@drawable/ic_artist" />
+            app:icon="@drawable/ic_home" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_album"s.supportv7.ATEListPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+        android:icon="@drawable/ic_album"
             android:defaultValue="4"
             android:entries="@array/pref_home_grid_style_list_titles"
             android:entryValues="@array/pref_home_grid_style_list_values"
@@ -27,24 +27,24 @@
             android:positiveButtonText="@null"
             android:title="@string/pref_title_home_album_grid_style" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_image"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_image"
             android:defaultValue="false"
             android:key="toggle_home_banner"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_home_banner"
             android:title="@string/pref_title_home_banner" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_star"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_star"
             android:defaultValue="true"
             android:key="toggle_suggestions"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_suggestions"
             android:title="@string/pref_title_suggestions" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_history"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_history"
             android:defaultValue="false"
             android:key="pause_history"
             android:layout="@layout/list_item_view_switch"
@@ -62,34 +62,34 @@
             android:layout="@layout/list_item_view"
             android:summary="@string/pref_summary_library_categories"
             android:title="@string/library_categories"
-            android:icon="@drawable/ic_library_music" />
+            app:icon="@drawable/ic_library_music" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_history"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_history"
             android:defaultValue="true"
             android:key="remember_last_tab"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_remember_tab"
             android:title="@string/pref_title_remember_tab" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_search"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_search"
             android:defaultValue="true"
             android:key="enable_search_playlist"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_enable_search_playlist"
             android:title="@string/pref_title_enable_search_playlist" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_play_arrow"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_play_arrow"
             android:defaultValue="true"
             android:key="scroll_to_playing_song"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_scroll_to_playing_song"
             android:title="@string/pref_title_scroll_to_playing_song" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_grid_size"s.supportv7.ATEListPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+        android:icon="@drawable/ic_grid_size"
             android:defaultValue="0"
             android:entries="@array/pref_tab_text_mode_titles"
             android:entryValues="@array/pref_tab_text_mode_values"
@@ -99,8 +99,8 @@
             android:positiveButtonText="@null"
             android:title="@string/pref_title_tab_text_mode" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_dashboard"s.supportv7.ATEListPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+        android:icon="@drawable/ic_dashboard"
             android:defaultValue="1"
             android:entries="@array/pref_appbar_mode_titles"
             android:entryValues="@array/pref_appbar_mode_values"
@@ -121,23 +121,22 @@
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_toggle_full_screen"
             android:title="@string/pref_title_toggle_full_screen"
-            android:icon="@drawable/ic_fullscreen" />
+            app:icon="@drawable/ic_fullscreen" />
     </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
 
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_header_lockscreen">
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_image"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="true"
             android:key="album_art_on_lock_screen"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_album_art_on_lockscreen"
             android:title="@string/pref_title_album_art_on_lockscreen" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_blur_on"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_blur_on"
             android:defaultValue="false"
             android:dependency="album_art_on_lock_screen"
             android:key="blurred_album_art"
@@ -145,8 +144,8 @@
             android:summary="@string/pref_summary_blurred_album_art"
             android:title="@string/pref_title_blurred_album_art" />
 
-        <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_screen_lock_portrait"s.supportv7.ATESwitchPreference
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_screen_lock_portrait"
             android:defaultValue="false"
             android:key="lock_screen"
             android:layout="@layout/list_item_view_switch"
