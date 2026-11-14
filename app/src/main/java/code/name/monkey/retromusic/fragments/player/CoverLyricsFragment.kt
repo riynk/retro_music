@@ -135,6 +135,10 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             binding.playerLyrics.alpha = 0f
             restoreArtworkDimming()
         } else {
+            // This fragment is a sibling of the artwork ViewPager's fading-edge
+            // layer. Keep the Over Cover lyrics container above that layer so the
+            // user sees timed lyrics over the cover, not just a dimmed image.
+            (binding.root.parent as? View)?.bringToFront()
             binding.playerLyrics.alpha = 1f
             binding.root.post { updateLyricsBounds() }
         }

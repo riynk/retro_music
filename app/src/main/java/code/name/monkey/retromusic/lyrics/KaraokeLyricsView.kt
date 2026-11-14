@@ -25,7 +25,7 @@ import code.name.monkey.retromusic.lyrics.model.LyricLine
 import code.name.monkey.retromusic.lyrics.model.LyricWord
 import kotlin.math.roundToInt
 
-private const val TTML_INACTIVE_TEXT_COLOR = 0x66FFFFFF
+private const val TTML_INACTIVE_TEXT_COLOR = 0x40FFFFFF
 
 /**
  * Shared karaoke renderer for Replace Cover, Over Cover and the full lyrics page.
