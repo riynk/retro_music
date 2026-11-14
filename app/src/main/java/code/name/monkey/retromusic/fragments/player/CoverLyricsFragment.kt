@@ -53,6 +53,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         }
 
         lyricsView.apply {
+            setCompactMode(true)
             setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER))
             setOnLineClickListener { time ->
                 MusicPlayerRemote.seekTo(time.toInt())

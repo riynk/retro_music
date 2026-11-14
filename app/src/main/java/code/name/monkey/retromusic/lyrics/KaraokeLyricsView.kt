@@ -51,6 +51,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
     private var translationStatus: String? = null
     private var translationStatusView: TextView? = null
     private var style = LyricsDisplayStyle()
+    private var compactMode = false
 
     private var primaryTextColor = resolveThemeColor(android.R.attr.textColorPrimary, Color.WHITE)
     private var secondaryTextColor =
@@ -79,6 +80,26 @@ class KaraokeLyricsView @JvmOverloads constructor(
         applyAlignment()
         document?.let { renderLines(it, currentLine) }
         translationStatusView?.typeface = resolveTypeface(style.fontFamily)
+    }
+
+    /**
+     * Shows only the active lyric and its immediate neighbours. Used by the
+     * artwork overlay so the lyric surface never turns into a full-page list.
+     */
+    fun setCompactMode(enabled: Boolean) {
+        if (compactMode == enabled) return
+        compactMode = enabled
+        content.setPadding(
+            dp(8),
+            if (enabled) dp(8) else dp(24),
+            dp(8),
+            if (enabled) dp(8) else dp(32)
+        )
+        content.layoutParams = content.layoutParams?.apply {
+            height = if (enabled) LayoutParams.MATCH_PARENT else LayoutParams.WRAP_CONTENT
+        }
+        applyAlignment()
+        document?.let { renderLines(it, currentLine) }
     }
 
     fun setTextColors(
@@ -156,14 +177,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
                 setOnClickListener { lineClickListener?.invoke(line.startMs) }
             }
             lineViews += lyric
-            content.addView(
-                lyric,
-                LinearLayout.LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT
-                )
-            )
-
             val translated = translations?.getOrNull(index)?.takeIf { it.isNotBlank() }
             val subtitle = translated?.let { text ->
                 TextView(context).apply {
@@ -173,15 +186,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
                 }
             }
             translationViews += subtitle
-            if (subtitle != null) {
-                content.addView(
-                    subtitle,
-                    LinearLayout.LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.WRAP_CONTENT
-                    )
-                )
-            }
         }
 
         refreshTranslationStatus()
@@ -198,7 +202,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
 
         if (lineChanged) {
             renderLines(value, position.lineIndex)
-            if (position.lineIndex >= 0) {
+            if (!compactMode && position.lineIndex >= 0) {
                 post {
                     val row = lineViews.getOrNull(position.lineIndex) ?: return@post
                     smoothScrollTo(
@@ -215,44 +219,159 @@ class KaraokeLyricsView @JvmOverloads constructor(
     }
 
     private fun renderLines(value: LyricDocument, activeIndex: Int) {
-        value.lines.forEachIndexed { index, line ->
-            val active = index == activeIndex
-            val lyric = lineViews[index]
-            val targetAlpha = when {
-                active -> 1f
-                kotlin.math.abs(index - activeIndex) == 1 -> 0.72f
-                else -> 0.42f
-            }
-            lyric.animate().cancel()
-            lyric.animate().alpha(targetAlpha).setDuration(260L).start()
-            lyric.setTextSize(
-                TypedValue.COMPLEX_UNIT_SP,
-                style.textSizeSp * if (active) 1f else 0.78f
-            )
-            lyric.typeface = resolveTypeface(style.fontFamily)
-            lyric.gravity = alignmentGravity()
-            val hasProgressiveHighlight =
-                active && highlightWords && line.words.isNotEmpty()
-            // Keep the unfilled text subdued. The accent colour is the moving
-            // overlay; a white base makes that sweep almost impossible to see.
-            lyric.setTextColor(
-                if (active && !hasProgressiveHighlight) primaryTextColor else secondaryTextColor
-            )
-            lyric.text = if (active) highlightedText(line) else line.text
-
-            translationViews.getOrNull(index)?.let { subtitle ->
-                subtitle.animate().cancel()
-                subtitle.animate().alpha(if (active) 0.9f else 0.42f)
-                    .setDuration(260L).start()
-                subtitle.setTextSize(
-                    TypedValue.COMPLEX_UNIT_SP,
-                    (style.textSizeSp * 0.58f).coerceAtLeast(12f)
+        content.removeAllViews()
+        translationStatusView?.let { status ->
+            content.addView(
+                status,
+                LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT
                 )
-                subtitle.typeface = resolveTypeface(style.fontFamily)
-                subtitle.gravity = alignmentGravity()
-                subtitle.setTextColor(secondaryTextColor)
+            )
+        }
+
+        if (compactMode) {
+            val visibleCount = minOf(3, value.lines.size)
+            if (visibleCount == 0) return
+            val focusIndex = activeIndex.coerceIn(0, value.lines.lastIndex)
+            val maxStart = (value.lines.size - visibleCount).coerceAtLeast(0)
+            val startIndex = (focusIndex - 1).coerceIn(0, maxStart)
+            for (index in startIndex until startIndex + visibleCount) {
+                addRenderedLine(index, activeIndex, compact = true)
+            }
+        } else {
+            value.lines.indices.forEach { index ->
+                addRenderedLine(index, activeIndex, compact = false)
             }
         }
+    }
+
+    private fun addRenderedLine(index: Int, activeIndex: Int, compact: Boolean) {
+        val line = document?.lines?.getOrNull(index) ?: return
+        val active = index == activeIndex
+        val lyric = lineViews[index]
+        val targetAlpha = when {
+            active -> 1f
+            kotlin.math.abs(index - activeIndex) == 1 -> 0.72f
+            else -> 0.42f
+        }
+        val hasProgressiveHighlight =
+            active && highlightWords && line.words.isNotEmpty()
+
+        lyric.animate().cancel()
+        lyric.setTextSize(
+            TypedValue.COMPLEX_UNIT_SP,
+            style.textSizeSp * when {
+                active -> 1f
+                compact -> 0.76f
+                else -> 0.78f
+            }
+        )
+        lyric.setPadding(
+            dp(12),
+            if (compact) dp(6) else dp(12),
+            dp(12),
+            if (compact) dp(6) else dp(2)
+        )
+        lyric.typeface = resolveTypeface(style.fontFamily)
+        lyric.gravity = alignmentGravity()
+        // TTML uses three layers: dim neighbouring lines, a brighter grey
+        // active base, and the theme accent progressively filling timed spans.
+        lyric.setTextColor(
+            when {
+                hasProgressiveHighlight -> activeKaraokeBaseColor()
+                active -> primaryTextColor
+                else -> secondaryTextColor
+            }
+        )
+        lyric.text = if (active) highlightedText(line) else line.text
+
+        val subtitle = translationViews.getOrNull(index)
+        subtitle?.animate()?.cancel()
+        if (subtitle != null) {
+            subtitle.setTextSize(
+                TypedValue.COMPLEX_UNIT_SP,
+                (style.textSizeSp * if (compact) 0.48f else 0.58f).coerceAtLeast(11f)
+            )
+            subtitle.setPadding(
+                dp(12),
+                0,
+                dp(12),
+                if (compact) dp(5) else dp(16)
+            )
+            subtitle.typeface = resolveTypeface(style.fontFamily)
+            subtitle.gravity = alignmentGravity()
+            subtitle.setTextColor(secondaryTextColor)
+        }
+
+        if (compact) {
+            lyric.alpha = 0f
+            lyric.translationY = if (index < activeIndex) -dp(8).toFloat() else dp(8).toFloat()
+        } else {
+            lyric.alpha = targetAlpha
+            lyric.translationY = 0f
+        }
+        content.addView(
+            lyric,
+            LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            )
+        )
+
+        // Keep the artwork readable: only the active line gets a translation
+        // subtitle in the compact overlay. Full-page lyrics retain all subtitles.
+        if (subtitle != null && (!compact || active)) {
+            if (compact) {
+                subtitle.alpha = 0f
+                subtitle.translationY = dp(5).toFloat()
+            } else {
+                subtitle.alpha = if (active) 0.9f else 0.42f
+                subtitle.translationY = 0f
+            }
+            content.addView(
+                subtitle,
+                LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+
+        if (compact) {
+            lyric.animate()
+                .alpha(targetAlpha)
+                .translationY(0f)
+                .setDuration(220L)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+            if (subtitle != null && active) {
+                subtitle.animate()
+                    .alpha(0.9f)
+                    .translationY(0f)
+                    .setDuration(220L)
+                    .setInterpolator(android.view.animation.DecelerateInterpolator())
+                    .start()
+            }
+        } else {
+            lyric.animate().alpha(targetAlpha).setDuration(260L).start()
+            subtitle?.animate()?.alpha(if (active) 0.9f else 0.42f)
+                ?.setDuration(260L)?.start()
+        }
+    }
+
+    private fun activeKaraokeBaseColor(): Int =
+        blendColors(primaryTextColor, secondaryTextColor, 0.45f)
+
+    private fun blendColors(start: Int, end: Int, fraction: Float): Int {
+        val amount = fraction.coerceIn(0f, 1f)
+        val inverse = 1f - amount
+        return Color.argb(
+            (Color.alpha(start) * inverse + Color.alpha(end) * amount).roundToInt(),
+            (Color.red(start) * inverse + Color.red(end) * amount).roundToInt(),
+            (Color.green(start) * inverse + Color.green(end) * amount).roundToInt(),
+            (Color.blue(start) * inverse + Color.blue(end) * amount).roundToInt()
+        )
     }
 
     private fun renderActiveLine() {
@@ -276,7 +395,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
                     ProgressiveLyricsSpan(
                         word = word,
                         positionProvider = { currentPositionMs },
-                        baseColor = unfilled,
+                        baseColor = activeKaraokeBaseColor(),
                         highlightColor = accentTextColor
                     ),
                     start,
@@ -317,7 +436,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
     }
 
     private fun applyAlignment() {
-        content.gravity = alignmentGravity()
+        content.gravity = if (compactMode) Gravity.CENTER else alignmentGravity()
         lineViews.forEach { it.gravity = alignmentGravity() }
         translationViews.filterNotNull().forEach { it.gravity = alignmentGravity() }
         translationStatusView?.gravity = alignmentGravity()

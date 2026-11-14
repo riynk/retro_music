@@ -80,16 +80,54 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
     }
 
     private fun performQuickAction(actionId: Int) {
+        val button = when (actionId) {
+            R.id.action_sleep_timer -> binding.quickSleepTimer
+            R.id.action_toggle_lyrics -> binding.quickLyrics
+            R.id.action_toggle_favorite -> binding.quickFavorite
+            R.id.now_playing -> binding.quickQueue
+            else -> null
+        }
+        button?.let(::animateQuickAction)
+
         val item = binding.playerToolbar.menu.findItem(actionId) ?: return
         onMenuItemClick(item)
         updateQuickActions()
     }
 
+    private fun animateQuickAction(view: View) {
+        view.animate().cancel()
+        view.scaleX = 1f
+        view.scaleY = 1f
+        view.animate()
+            .scaleX(0.88f)
+            .scaleY(0.88f)
+            .setDuration(75L)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1.07f)
+                    .scaleY(1.07f)
+                    .setDuration(110L)
+                    .withEndAction {
+                        view.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(90L)
+                            .start()
+                    }
+                    .start()
+            }
+            .start()
+    }
+
     private fun updateQuickActions() {
         if (_binding == null) return
-        binding.quickLyrics.isSelected = PreferenceUtil.showLyrics
-        binding.quickFavorite.isSelected =
+        val lyricsEnabled = PreferenceUtil.showLyrics
+        val favoriteEnabled =
             binding.playerToolbar.menu.findItem(R.id.action_toggle_favorite)?.isChecked == true
+        binding.quickLyrics.isSelected = lyricsEnabled
+        binding.quickLyrics.isActivated = lyricsEnabled
+        binding.quickFavorite.isSelected = favoriteEnabled
+        binding.quickFavorite.isActivated = favoriteEnabled
     }
 
     private fun updateSong() {
@@ -218,6 +256,9 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
 
     override fun toggleFavorite(song: Song) {
         super.toggleFavorite(song)
-        if (song.id == MusicPlayerRemote.currentSong.id) updateIsFavorite()
+        if (song.id == MusicPlayerRemote.currentSong.id) {
+            updateIsFavorite()
+            updateQuickActions()
+        }
     }
 }
