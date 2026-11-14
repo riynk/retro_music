@@ -20,6 +20,7 @@ import kotlin.math.roundToLong
  */
 object TtmlLyricsParser {
     private const val TTM_NAMESPACE = "http://www.w3.org/ns/ttml#metadata"
+    private val WORD_TOKEN_PATTERN = Regex("""[^\s\u00A0\-\u2010\u2013\u2014]+""")
 
     private data class SpanFrame(
         val startIndex: Int,
@@ -110,12 +111,12 @@ object TtmlLyricsParser {
                                 val startIndex = frame.startIndex.coerceIn(0, endIndex)
                                 val segmentText = current.text.substring(startIndex, endIndex)
                                 if (segmentText.isNotBlank()) {
-                                    current.words += LyricWord(
-                                        startMs = frame.beginMs,
+                                    appendTimedWords(
+                                        target = current.words,
+                                        segmentText = segmentText,
+                                        absoluteStartIndex = startIndex,
+                                        beginMs = frame.beginMs,
                                         endMs = frame.endMs,
-                                        text = segmentText,
-                                        startIndex = startIndex,
-                                        endIndex = endIndex,
                                         isBackground = frame.isBackground
                                     )
                                 }
@@ -177,6 +178,46 @@ object TtmlLyricsParser {
             },
             sourceFormat = "ttml"
         )
+    }
+
+    /**
+     * Some Apple-style files put a whole phrase in one timed <span>.
+     * Split it into word-sized visual units and distribute the span's existing
+     * interval evenly. These intermediate times are estimates, not timestamps
+     * explicitly supplied by the TTML source.
+     */
+    private fun appendTimedWords(
+        target: MutableList<LyricWord>,
+        segmentText: String,
+        absoluteStartIndex: Int,
+        beginMs: Long,
+        endMs: Long,
+        isBackground: Boolean
+    ) {
+        val tokens = WORD_TOKEN_PATTERN.findAll(segmentText).toList()
+        if (tokens.isEmpty()) return
+
+        val durationMs = (endMs - beginMs).coerceAtLeast(1L)
+        tokens.forEachIndexed { index, token ->
+            val tokenStart = beginMs + durationMs * index / tokens.size
+            val tokenEnd = if (index == tokens.lastIndex) {
+                endMs
+            } else {
+                beginMs + durationMs * (index + 1) / tokens.size
+            }
+            if (tokenEnd <= tokenStart) return@forEachIndexed
+
+            val startIndex = absoluteStartIndex + token.range.first
+            val endIndex = absoluteStartIndex + token.range.last + 1
+            target += LyricWord(
+                startMs = tokenStart,
+                endMs = tokenEnd,
+                text = token.value,
+                startIndex = startIndex,
+                endIndex = endIndex,
+                isBackground = isBackground
+            )
+        }
     }
 
     private fun attribute(parser: XmlPullParser, name: String): String? {

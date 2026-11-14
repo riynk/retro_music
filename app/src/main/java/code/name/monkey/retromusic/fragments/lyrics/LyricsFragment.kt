@@ -124,7 +124,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         enterTransition = Fade()
         exitTransition = Fade()
         _binding = FragmentLyricsBinding.bind(view)
-        updateHelper = MusicProgressViewUpdateHelper(this, 500, 1000)
+        updateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
         updateTitleSong()
         setupLyricsView()
 

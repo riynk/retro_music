@@ -35,7 +35,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCoverLyricsBinding.bind(view)
-        progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 500, 1000)
+        progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
 
         if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.Fit ||
             PreferenceUtil.nowPlayingScreen == NowPlayingScreen.Full

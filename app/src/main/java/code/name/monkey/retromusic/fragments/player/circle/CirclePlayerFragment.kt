@@ -96,7 +96,7 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        progressViewUpdateHelper = MusicProgressViewUpdateHelper(this)
+        progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

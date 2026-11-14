@@ -45,7 +45,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
     private var translations: List<String>? = null
     private var highlightWords = true
     private var currentLine = -2
-    private var currentWord = -2
     private var currentPositionMs = 0L
     private var lineClickListener: ((Long) -> Unit)? = null
     private var translationRetryListener: (() -> Unit)? = null
@@ -198,7 +197,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
         val position = LyricsSynchronizer.locate(value, currentPositionMs)
         val lineChanged = position.lineIndex != currentLine
         currentLine = position.lineIndex
-        currentWord = position.wordIndex
 
         if (lineChanged) {
             renderLines(value, position.lineIndex)
@@ -212,9 +210,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
                 }
             }
         } else if (position.lineIndex >= 0) {
-            // Rebuild the active line's spans on every progress tick so the
-            // highlight moves smoothly through the current timed segment.
-            renderActiveLine(value.lines.getOrNull(position.lineIndex))
+            // The active spans read currentPositionMs when drawn. Only invalidate:
+            // rebuilding Spannable text on every tick forces extra layout work.
+            renderActiveLine()
         }
     }
 
@@ -222,11 +220,13 @@ class KaraokeLyricsView @JvmOverloads constructor(
         value.lines.forEachIndexed { index, line ->
             val active = index == activeIndex
             val lyric = lineViews[index]
-            lyric.alpha = when {
+            val targetAlpha = when {
                 active -> 1f
                 kotlin.math.abs(index - activeIndex) == 1 -> 0.72f
                 else -> 0.42f
             }
+            lyric.animate().cancel()
+            lyric.animate().alpha(targetAlpha).setDuration(260L).start()
             lyric.setTextSize(
                 TypedValue.COMPLEX_UNIT_SP,
                 style.textSizeSp * if (active) 1f else 0.78f
@@ -234,10 +234,12 @@ class KaraokeLyricsView @JvmOverloads constructor(
             lyric.typeface = resolveTypeface(style.fontFamily)
             lyric.gravity = alignmentGravity()
             lyric.setTextColor(if (active) primaryTextColor else secondaryTextColor)
-            lyric.text = if (active) highlightedText(line, currentPositionMs) else line.text
+            lyric.text = if (active) highlightedText(line) else line.text
 
             translationViews.getOrNull(index)?.let { subtitle ->
-                subtitle.alpha = if (active) 0.9f else 0.42f
+                subtitle.animate().cancel()
+                subtitle.animate().alpha(if (active) 0.9f else 0.42f)
+                    .setDuration(260L).start()
                 subtitle.setTextSize(
                     TypedValue.COMPLEX_UNIT_SP,
                     (style.textSizeSp * 0.58f).coerceAtLeast(12f)
@@ -249,26 +251,28 @@ class KaraokeLyricsView @JvmOverloads constructor(
         }
     }
 
-    private fun renderActiveLine(line: LyricLine?) {
+    private fun renderActiveLine() {
         val index = currentLine
-        if (line != null && index in lineViews.indices) {
-            lineViews[index].text = highlightedText(line, currentPositionMs)
+        if (index in lineViews.indices) {
+            lineViews[index].invalidate()
         }
     }
 
-    private fun highlightedText(line: LyricLine, positionMs: Long): CharSequence {
+    private fun highlightedText(line: LyricLine): CharSequence {
         if (!highlightWords || line.words.isEmpty()) return line.text
         val spannable = SpannableString(line.text)
         line.words.forEach { word ->
             val start = word.startIndex.coerceIn(0, spannable.length)
             val end = word.endIndex.coerceIn(start, spannable.length)
             if (end > start) {
-                val duration = (word.endMs - word.startMs).coerceAtLeast(1L)
-                val progress = ((positionMs - word.startMs).toFloat() / duration)
-                    .coerceIn(0f, 1f)
                 val unfilled = if (word.isBackground) secondaryTextColor else primaryTextColor
                 spannable.setSpan(
-                    ProgressiveLyricsSpan(progress, unfilled, accentTextColor),
+                    ProgressiveLyricsSpan(
+                        word = word,
+                        positionProvider = { currentPositionMs },
+                        baseColor = unfilled,
+                        highlightColor = accentTextColor
+                    ),
                     start,
                     end,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -337,7 +341,8 @@ class KaraokeLyricsView @JvmOverloads constructor(
         (value * resources.displayMetrics.density).toInt()
 
     private class ProgressiveLyricsSpan(
-        private val progress: Float,
+        private val word: LyricWord,
+        private val positionProvider: () -> Long,
         private val baseColor: Int,
         private val highlightColor: Int
     ) : ReplacementSpan() {
@@ -365,7 +370,10 @@ class KaraokeLyricsView @JvmOverloads constructor(
             val width = basePaint.measureText(value)
             canvas.drawText(value, x, y.toFloat(), basePaint)
 
-            val fillWidth = width * progress.coerceIn(0f, 1f)
+            val duration = (word.endMs - word.startMs).coerceAtLeast(1L)
+            val progress = ((positionProvider() - word.startMs).toFloat() / duration)
+                .coerceIn(0f, 1f)
+            val fillWidth = width * progress
             if (fillWidth > 0f) {
                 val save = canvas.save()
                 canvas.clipRect(x, top.toFloat(), x + fillWidth, bottom.toFloat())
