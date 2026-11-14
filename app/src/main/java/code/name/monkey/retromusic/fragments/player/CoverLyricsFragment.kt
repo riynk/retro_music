@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.LYRICS_TYPE
 import code.name.monkey.retromusic.SHOW_LYRICS
 import code.name.monkey.retromusic.databinding.FragmentCoverLyricsBinding
 import code.name.monkey.retromusic.fragments.NowPlayingScreen
@@ -27,6 +28,7 @@ import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
 import code.name.monkey.retromusic.lyrics.LyricsDocumentLoader
 import code.name.monkey.retromusic.lyrics.LyricsSurface
 import code.name.monkey.retromusic.lyrics.LyricsPreferences
+import code.name.monkey.retromusic.util.CoverLyricsType
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import kotlinx.coroutines.CancellationException
@@ -70,8 +72,9 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             setOnTranslationRetryListener { updateLyrics() }
         }
 
-        setLyricsOverlayVisible(PreferenceUtil.showLyrics)
-        if (PreferenceUtil.showLyrics) {
+        val showOverCoverLyrics = shouldShowOverCoverLyrics()
+        setLyricsOverlayVisible(showOverCoverLyrics)
+        if (showOverCoverLyrics) {
             progressViewUpdateHelper?.start()
             updateLyrics()
         }
@@ -85,35 +88,43 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         when {
-            key == SHOW_LYRICS -> {
-                val enabled = sharedPreferences.getBoolean(SHOW_LYRICS, false)
+            key == SHOW_LYRICS || key == LYRICS_TYPE -> {
+                val enabled = sharedPreferences.getBoolean(SHOW_LYRICS, false) &&
+                    PreferenceUtil.lyricsType == CoverLyricsType.OVER_COVER
                 setLyricsOverlayVisible(enabled)
                 if (enabled) {
                     progressViewUpdateHelper?.start()
                     updateLyrics()
                 } else {
+                    lyricsLoadRequest++
+                    lyricsLoadJob?.cancel()
                     progressViewUpdateHelper?.stop()
                     lyricsView.clearDocument()
                 }
             }
             key?.startsWith("lyrics_") == true -> {
-                lyricsView.setStyle(
-                    LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
-                )
-                updateLyrics()
+                if (shouldShowOverCoverLyrics()) {
+                    lyricsView.setStyle(
+                        LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
+                    )
+                    updateLyrics()
+                }
             }
         }
     }
 
     override fun onPlayingMetaChanged() {
         super.onPlayingMetaChanged()
-        if (PreferenceUtil.showLyrics) updateLyrics()
+        if (shouldShowOverCoverLyrics()) updateLyrics()
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        if (PreferenceUtil.showLyrics) updateLyrics()
+        if (shouldShowOverCoverLyrics()) updateLyrics()
     }
+
+    private fun shouldShowOverCoverLyrics(): Boolean =
+        PreferenceUtil.showLyrics && PreferenceUtil.lyricsType == CoverLyricsType.OVER_COVER
 
     private fun setLyricsOverlayVisible(visible: Boolean) {
         // The FragmentContainerView can be visible while its child artwork overlay
@@ -308,10 +319,13 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         super.onResume()
         PreferenceManager.getDefaultSharedPreferences(requireContext())
             .registerOnSharedPreferenceChangeListener(this)
-        if (PreferenceUtil.showLyrics) {
+        if (shouldShowOverCoverLyrics()) {
             setLyricsOverlayVisible(true)
             progressViewUpdateHelper?.start()
             updateLyrics()
+        } else {
+            setLyricsOverlayVisible(false)
+            progressViewUpdateHelper?.stop()
         }
         updateLyricsBounds()
     }
