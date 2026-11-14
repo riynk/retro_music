@@ -14,15 +14,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Optional on-device translation for user-provided lyrics. No lyric text is
- * sent to a third-party lyrics catalogue.
+ * Google ML Kit on-device translation. Google downloads the language model
+ * when required; the actual lyric lines are then translated locally.
  */
 object MlKitLyricsTranslator {
     suspend fun translate(lines: List<String>, targetLanguageTag: String): List<String> =
         withContext(Dispatchers.IO) {
             if (lines.isEmpty()) return@withContext emptyList()
 
-            val joinedText = lines.joinToString(separator = " ").take(2_000)
+            val joinedText = lines.asSequence()
+                .filter { it.isNotBlank() }
+                .take(40)
+                .joinToString(separator = " ")
+                .take(2_000)
+            if (joinedText.isBlank()) return@withContext lines
+
             val identifier = LanguageIdentification.getClient()
             val sourceTag = try {
                 Tasks.await(identifier.identifyLanguage(joinedText))
@@ -31,9 +37,9 @@ object MlKitLyricsTranslator {
             }
 
             val sourceLanguage = TranslateLanguage.fromLanguageTag(sourceTag)
-                ?: TranslateLanguage.ENGLISH
+                ?: throw IllegalStateException("Could not identify the lyric language")
             val targetLanguage = TranslateLanguage.fromLanguageTag(targetLanguageTag)
-                ?: TranslateLanguage.INDONESIAN
+                ?: throw IllegalArgumentException("The selected translation language is not supported")
 
             if (sourceLanguage == targetLanguage) return@withContext lines
 
@@ -45,9 +51,11 @@ object MlKitLyricsTranslator {
             )
 
             try {
-                Tasks.await(translator.downloadModelIfNeeded(DownloadConditions.Builder().build()))
-                lines.map { text ->
-                    if (text.isBlank()) "" else Tasks.await(translator.translate(text))
+                translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).let {
+                    Tasks.await(it)
+                }
+                lines.map { line ->
+                    if (line.isBlank()) "" else Tasks.await(translator.translate(line))
                 }
             } finally {
                 translator.close()

@@ -9,14 +9,16 @@ data class LyricWord(
     val endMs: Long,
     val text: String,
     val startIndex: Int,
-    val endIndex: Int
+    val endIndex: Int,
+    val isBackground: Boolean = false
 )
 
 data class LyricLine(
     val startMs: Long,
     val endMs: Long?,
     val text: String,
-    val words: List<LyricWord> = emptyList()
+    val words: List<LyricWord> = emptyList(),
+    val agent: String? = null
 )
 
 data class LyricDocument(

@@ -34,6 +34,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
 import androidx.viewpager.widget.ViewPager
@@ -113,6 +114,14 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
 
             R.id.action_go_to_lyrics -> {
                 goToLyrics(requireActivity())
+                return true
+            }
+
+            R.id.action_toggle_lyrics_translation -> {
+                val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val enabled = !preferences.getBoolean("lyrics_show_translation", false)
+                preferences.edit().putBoolean("lyrics_show_translation", enabled).apply()
+                item.isChecked = enabled
                 return true
             }
 
@@ -346,16 +355,13 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
     @SuppressLint("ClickableViewAccessibility")
     override fun onResume() {
         super.onResume()
-        val nps = PreferenceUtil.nowPlayingScreen
-
-        if (nps == NowPlayingScreen.Circle || nps == NowPlayingScreen.Peek || nps == NowPlayingScreen.Tiny) {
-            playerToolbar()?.menu?.removeItem(R.id.action_toggle_lyrics)
-        } else {
-            playerToolbar()?.menu?.findItem(R.id.action_toggle_lyrics)?.apply {
-                isChecked = PreferenceUtil.showLyrics
-                showLyricsIcon(this)
-            }
+        playerToolbar()?.menu?.findItem(R.id.action_toggle_lyrics)?.apply {
+            isChecked = PreferenceUtil.showLyrics
+            showLyricsIcon(this)
         }
+        playerToolbar()?.menu?.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("lyrics_show_translation", false)
     }
 
     override fun onStart() {

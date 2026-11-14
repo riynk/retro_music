@@ -31,6 +31,7 @@ import androidx.preference.PreferenceManager
 import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
 import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
 import code.name.monkey.retromusic.lyrics.LyricsSurface
+import code.name.monkey.retromusic.lyrics.LyricsDocumentLoader
 import code.name.monkey.retromusic.lyrics.model.LyricDocument
 import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
 import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
@@ -136,6 +137,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         binding.karaokeLyricsView.apply {
             setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.FULL_PAGE))
             setOnLineClickListener { time -> MusicPlayerRemote.seekTo(time.toInt()) }
+            setOnTranslationRetryListener { loadLyrics() }
         }
         binding.lyricsView.apply {
             setCurrentColor(accentColor())
@@ -195,11 +197,17 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     }
 
     private fun setupWakelock() {
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        if (PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("screen_on_lyrics", false)
+        ) requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        else requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lyrics, menu)
+        menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("lyrics_show_translation", false)
         ToolbarContentTintHelper.handleOnCreateOptionsMenu(
             requireContext(),
             binding.toolbar,
@@ -208,11 +216,20 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         )
     }
 
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_search) {
+    override fun onMenuItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_search -> {
             openUrl(googleSearchLrcUrl)
+            true
         }
-        return false
+        R.id.action_toggle_lyrics_translation -> {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val enabled = !preferences.getBoolean("lyrics_show_translation", false)
+            preferences.edit().putBoolean("lyrics_show_translation", enabled).apply()
+            item.isChecked = enabled
+            loadLyrics()
+            true
+        }
+        else -> false
     }
 
     @SuppressLint("CheckResult")
@@ -371,68 +388,40 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         lyricsLoadJob?.cancel()
         val currentSong = song
         lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
-            val advancedLyrics = withContext(Dispatchers.IO) {
-                val ttmlFile = LyricUtil.getTtmlLyricsFile(currentSong)
-                val ttmlDocument = if (ttmlFile?.isFile == true) {
-                    runCatching { TtmlLyricsParser.parse(ttmlFile.readText()) }.getOrNull()
-                } else {
-                    null
-                }
-                if (ttmlDocument != null) {
-                    ttmlDocument to true
-                } else {
-                    val lrcText = LyricUtil.getSyncedLyricsFile(currentSong)
-                        ?.takeIf { it.isFile }
-                        ?.let { runCatching { it.readText() }.getOrNull() }
-                        ?: LyricUtil.getEmbeddedSyncedLyrics(currentSong.data)
-                    val document = lrcText?.let { LrcLyricsParser.parse(it) }
-                    // Standard LRC remains line-synchronized but can still be translated.
-                    document?.let { it to false }
-                }
-            }
+            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            binding.karaokeLyricsView.setTranslationStatus(
+                if (translationRequested) getString(R.string.lyrics_translation_loading) else null
+            )
+            val loaded = runCatching {
+                LyricsDocumentLoader.load(requireContext(), currentSong)
+            }.getOrNull()
+            if (_binding == null) return@launch
 
-            if (advancedLyrics != null) {
-                val (document, isTtml) = advancedLyrics
-                val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val showTranslation = preferences.getBoolean("lyrics_show_translation", false)
-                val targetLanguage = preferences.getString("lyrics_translation_language", "id") ?: "id"
-                val cache = LyricsTranslationCache(requireContext())
-                val songKey = currentSong.data.hashCode()
-                val lyricHash = document.lines.joinToString("|") { it.text }.hashCode()
-
-                val translations = if (showTranslation) {
-                    withContext(Dispatchers.IO) {
-                        cache.get(songKey, targetLanguage, lyricHash)
-                            ?: runCatching {
-                                MlKitLyricsTranslator.translate(
-                                    document.lines.map { it.text },
-                                    targetLanguage
-                                )
-                            }.getOrNull()?.also {
-                                cache.put(songKey, targetLanguage, lyricHash, it)
-                            }
-                    }
-                } else {
-                    null
-                }
-
+            if (loaded != null) {
                 binding.karaokeLyricsView.setStyle(
                     LyricsDisplaySettings.read(requireContext(), LyricsSurface.FULL_PAGE)
                 )
+                binding.karaokeLyricsView.setTranslationStatus(
+                    if (loaded.translationFailed) getString(R.string.lyrics_translation_failed) else null
+                )
                 binding.karaokeLyricsView.setDocument(
-                    document,
-                    translations,
+                    loaded.document,
+                    loaded.translations,
                     preferences.getBoolean("lyrics_word_highlight", true)
                 )
                 binding.karaokeLyricsView.isVisible = true
                 binding.lyricsView.isVisible = false
                 binding.normalLyrics.isVisible = false
                 binding.noLyricsFound.isVisible = false
-                binding.editButton.isVisible = !isTtml
-                lyricsType = LyricsType.ADVANCED_LYRICS
+                binding.editButton.isVisible = loaded.document.sourceFormat != "ttml"
+                lyricsType = if (loaded.document.sourceFormat == "ttml") {
+                    LyricsType.ADVANCED_LYRICS
+                } else LyricsType.SYNCED_LYRICS
                 return@launch
             }
 
+            binding.karaokeLyricsView.setTranslationStatus(null)
             binding.karaokeLyricsView.isVisible = false
             binding.editButton.isVisible = true
             lyricsType = if (!loadLRCLyrics()) {
@@ -464,8 +453,8 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         super.onDestroyView()
         lyricsLoadJob?.cancel()
         lyricsLoadJob = null
-        if (MusicPlayerRemote.playingQueue.isNotEmpty())
-            mainActivity.expandPanel()
+        if (MusicPlayerRemote.playingQueue.isNotEmpty()) mainActivity.expandPanel()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         _binding = null
     }
 

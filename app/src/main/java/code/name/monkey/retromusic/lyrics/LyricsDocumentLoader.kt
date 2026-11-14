@@ -18,12 +18,15 @@ import kotlinx.coroutines.withContext
 
 data class LoadedLyrics(
     val document: LyricDocument,
-    val translations: List<String>?
+    val translations: List<String>?,
+    val translationRequested: Boolean,
+    val translationFailed: Boolean
 )
 
 /**
- * Resolves local lyrics once for all three lyric surfaces. TTML takes priority
- * when it parses successfully; malformed TTML falls back to LRC/embedded lyrics.
+ * Resolves local lyrics once for all lyric surfaces. Translation is performed
+ * per complete lyric line and the result is paired back to the same timestamped
+ * line index.
  */
 object LyricsDocumentLoader {
     suspend fun load(context: Context, song: Song): LoadedLyrics? =
@@ -45,30 +48,45 @@ object LyricsDocumentLoader {
             }.getOrNull() ?: return@withContext null
 
             val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
-            val translations = if (
-                preferences.getBoolean("lyrics_show_translation", false)
-            ) {
-                val targetLanguage = preferences.getString(
-                    "lyrics_translation_language",
-                    "id"
-                ) ?: "id"
-                val songKey = song.data.hashCode()
-                val lyricsHash = document.lines.joinToString("|") { it.text }.hashCode()
-                val cache = LyricsTranslationCache(appContext)
-
-                cache.get(songKey, targetLanguage, lyricsHash)
-                    ?: runCatching {
-                        MlKitLyricsTranslator.translate(
-                            document.lines.map { it.text },
-                            targetLanguage
-                        )
-                    }.getOrNull()?.takeIf { it.size == document.lines.size }?.also {
-                        cache.put(songKey, targetLanguage, lyricsHash, it)
-                    }
-            } else {
-                null
+            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            if (!translationRequested) {
+                return@withContext LoadedLyrics(
+                    document = document,
+                    translations = null,
+                    translationRequested = false,
+                    translationFailed = false
+                )
             }
 
-            LoadedLyrics(document, translations)
+            val targetLanguage = preferences.getString(
+                "lyrics_translation_language",
+                "id"
+            ) ?: "id"
+            val songKey = song.data.hashCode()
+            val lyricsHash = document.lines.joinToString("|") { it.text }.hashCode()
+            val cache = LyricsTranslationCache(appContext)
+
+            val cached = cache.get(songKey, targetLanguage, lyricsHash)
+            if (cached != null && cached.size == document.lines.size) {
+                return@withContext LoadedLyrics(document, cached, true, false)
+            }
+
+            val translated = runCatching {
+                MlKitLyricsTranslator.translate(
+                    document.lines.map { it.text },
+                    targetLanguage
+                )
+            }.getOrNull()?.takeIf { it.size == document.lines.size }
+
+            if (translated != null) {
+                cache.put(songKey, targetLanguage, lyricsHash, translated)
+            }
+
+            LoadedLyrics(
+                document = document,
+                translations = translated,
+                translationRequested = true,
+                translationFailed = translated == null
+            )
         }
 }

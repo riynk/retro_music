@@ -50,6 +50,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
                 MusicPlayerRemote.resumePlaying()
             }
             setOnClickListener { goToLyrics(requireActivity()) }
+            setOnTranslationRetryListener { updateLyrics() }
         }
 
         binding.root.isVisible = PreferenceUtil.showLyrics
@@ -101,6 +102,11 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         val song = MusicPlayerRemote.currentSong
         lyricsLoadJob?.cancel()
         lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            lyricsView.setTranslationStatus(
+                if (translationRequested) getString(R.string.lyrics_translation_loading) else null
+            )
             val loaded = runCatching {
                 LyricsDocumentLoader.load(requireContext(), song)
             }.getOrNull()
@@ -110,8 +116,12 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
                 LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
             )
             if (loaded == null) {
+                lyricsView.setTranslationStatus(null)
                 lyricsView.setEmptyMessage(getString(R.string.no_lyrics_found))
             } else {
+                lyricsView.setTranslationStatus(
+                    if (loaded.translationFailed) getString(R.string.lyrics_translation_failed) else null
+                )
                 val showWordHighlight = PreferenceManager.getDefaultSharedPreferences(
                     requireContext()
                 ).getBoolean("lyrics_word_highlight", true)

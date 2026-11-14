@@ -29,6 +29,33 @@
         android:layout="@layout/list_item_view"
         android:title="@string/pref_title_lyrics_type" />
 
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_header_lyrics">
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="true"
+            android:key="lyrics_word_highlight"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_lyrics_word_highlight_summary"
+            android:title="@string/pref_lyrics_word_highlight" />
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="false"
+            android:key="lyrics_show_translation"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_lyrics_translation_summary"
+            android:title="@string/pref_lyrics_translation" />
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+            android:defaultValue="id"
+            android:entries="@array/pref_lyrics_language_names"
+            android:entryValues="@array/pref_lyrics_language_codes"
+            android:key="lyrics_translation_language"
+            android:layout="@layout/list_item_view"
+            android:title="@string/pref_lyrics_translation_language" />
+    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+
 
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"

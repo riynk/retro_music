@@ -16,6 +16,7 @@ package code.name.monkey.retromusic.fragments.player.circle
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
@@ -27,25 +28,36 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.getSystemService
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import code.name.monkey.appthemehelper.util.TintHelper
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.LYRICS_TYPE
+import code.name.monkey.retromusic.SHOW_LYRICS
 import code.name.monkey.retromusic.databinding.FragmentCirclePlayerBinding
 import code.name.monkey.retromusic.extensions.*
 import code.name.monkey.retromusic.fragments.MusicSeekSkipTouchListener
 import code.name.monkey.retromusic.fragments.base.AbsPlayerFragment
 import code.name.monkey.retromusic.fragments.base.goToAlbum
 import code.name.monkey.retromusic.fragments.base.goToArtist
+import code.name.monkey.retromusic.fragments.base.goToLyrics
 import code.name.monkey.retromusic.glide.RetroGlideExtension
 import code.name.monkey.retromusic.glide.RetroGlideExtension.simpleSongCoverOptions
 import code.name.monkey.retromusic.glide.crossfadeListener
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
+import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
+import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
+import code.name.monkey.retromusic.lyrics.LyricsDocumentLoader
+import code.name.monkey.retromusic.lyrics.LyricsSurface
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper.Callback
 import code.name.monkey.retromusic.helper.PlayPauseButtonOnClickHandler
 import code.name.monkey.retromusic.util.MusicUtil
+import code.name.monkey.retromusic.util.CoverLyricsType
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import code.name.monkey.retromusic.volume.AudioVolumeObserver
@@ -54,6 +66,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.google.android.material.slider.Slider
 import me.tankery.lib.circularseekbar.CircularSeekBar
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * Created by hemanths on 2020-01-06.
@@ -61,7 +75,8 @@ import me.tankery.lib.circularseekbar.CircularSeekBar
 
 class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player), Callback,
     OnAudioVolumeChangedListener,
-    CircularSeekBar.OnCircularSeekBarChangeListener {
+    CircularSeekBar.OnCircularSeekBarChangeListener,
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var progressViewUpdateHelper: MusicProgressViewUpdateHelper
     private var audioVolumeObserver: AudioVolumeObserver? = null
@@ -74,6 +89,8 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
 
     private var rotateAnimator: ObjectAnimator? = null
     private var lastRequest: RequestBuilder<Drawable>? = null
+    private var lyricsLoadJob: Job? = null
+    private val lyricsView: KaraokeLyricsView get() = binding.lyricsView
 
     var isSeeking = false
 
@@ -95,6 +112,16 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
             goToArtist(requireActivity())
         }
         binding.songInfo.drawAboveSystemBars()
+        lyricsView.apply {
+            setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER))
+            setOnLineClickListener { time ->
+                MusicPlayerRemote.seekTo(time.toInt())
+                MusicPlayerRemote.resumePlaying()
+            }
+            setOnClickListener { goToLyrics(requireActivity()) }
+            setOnTranslationRetryListener { updateLyrics() }
+        }
+        updateLyricsVisibility()
     }
 
     private fun setUpPlayerToolbar() {
@@ -166,6 +193,10 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
     override fun onResume() {
         super.onResume()
         progressViewUpdateHelper.start()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .registerOnSharedPreferenceChangeListener(this)
+        updateLyricsVisibility()
+        if (PreferenceUtil.showLyrics) updateLyrics()
         if (audioVolumeObserver == null) {
             audioVolumeObserver = AudioVolumeObserver(requireActivity())
         }
@@ -183,6 +214,8 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
         super.onPause()
         lastRequest = null
         progressViewUpdateHelper.stop()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun playerToolbar(): Toolbar {
@@ -249,6 +282,7 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
                 it.crossfadeListener()
                     .into(binding.albumCover)
             }
+        if (PreferenceUtil.showLyrics) updateLyrics()
     }
 
     private fun updatePlayPauseDrawableState() {
@@ -268,6 +302,7 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
         if (audioVolumeObserver != null) {
             audioVolumeObserver!!.unregister()
         }
+        lyricsLoadJob?.cancel()
         _binding = null
     }
 
@@ -323,5 +358,66 @@ class CirclePlayerFragment : AbsPlayerFragment(R.layout.fragment_circle_player),
 
         binding.songTotalTime.text = MusicUtil.getReadableDurationString(total.toLong())
         binding.songCurrentProgress.text = MusicUtil.getReadableDurationString(progress.toLong())
+        lyricsView.updateTime(progress.toLong())
+    }
+
+    private fun updateLyricsVisibility() {
+        if (_binding == null) return
+        val show = PreferenceUtil.showLyrics
+        val replaceCover = PreferenceUtil.lyricsType == CoverLyricsType.REPLACE_COVER
+        lyricsView.isVisible = show
+        binding.albumCover.isVisible = !show || !replaceCover
+        binding.albumCoverOverlay.isVisible = !show || !replaceCover
+        lyricsView.setBackgroundResource(
+            if (show && !replaceCover) R.drawable.lyrics_mask else android.R.color.transparent
+        )
+        if (!show) {
+            lyricsView.clearDocument()
+            lyricsView.setTranslationStatus(null)
+        }
+    }
+
+    private fun updateLyrics() {
+        if (_binding == null || !PreferenceUtil.showLyrics) return
+        val song = MusicPlayerRemote.currentSong
+        lyricsLoadJob?.cancel()
+        lyricsView.setStyle(
+            LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
+        )
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+        lyricsView.setTranslationStatus(
+            if (translationRequested) getString(R.string.lyrics_translation_loading) else null
+        )
+        lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val loaded = runCatching {
+                LyricsDocumentLoader.load(requireContext(), song)
+            }.getOrNull()
+            if (_binding == null) return@launch
+            if (loaded == null) {
+                lyricsView.setTranslationStatus(null)
+                lyricsView.setEmptyMessage(getString(R.string.no_lyrics_found))
+            } else {
+                lyricsView.setTranslationStatus(
+                    if (loaded.translationFailed) getString(R.string.lyrics_translation_failed) else null
+                )
+                val highlight = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean("lyrics_word_highlight", true)
+                lyricsView.setDocument(loaded.document, loaded.translations, highlight)
+            }
+            lyricsLoadJob = null
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            SHOW_LYRICS, LYRICS_TYPE -> {
+                updateLyricsVisibility()
+                if (PreferenceUtil.showLyrics) updateLyrics()
+            }
+            else -> if (key?.startsWith("lyrics_") == true && PreferenceUtil.showLyrics) {
+                updateLyrics()
+            }
+        }
     }
 }

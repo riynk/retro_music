@@ -533,7 +533,7 @@
     <string name="pref_lyrics_word_highlight">Word-by-word highlighting</string>
     <string name="pref_lyrics_word_highlight_summary">Highlight timed words when the lyric file contains word-level timestamps</string>
     <string name="pref_lyrics_translation">Show translation</string>
-    <string name="pref_lyrics_translation_summary">Translate local lyrics on this device; language models may need to be downloaded</string>
+    <string name="pref_lyrics_translation_summary">Translate each complete lyric line into the selected language. Internet is needed once to download the Google model; translation then runs on this device</string>
     <string name="pref_lyrics_translation_language">Translation language</string>
 
     <string name="pref_header_lyrics_appearance">Lyrics appearance</string>
@@ -543,5 +543,8 @@
     <string name="pref_lyrics_text_size">Text size (sp)</string>
     <string name="pref_lyrics_font_family">Font family</string>
     <string name="pref_lyrics_alignment">Text alignment</string>
+    <string name="lyrics_translation_loading">Preparing Google on-device translation…</string>
+    <string name="lyrics_translation_failed">Translation could not start. Tap here to retry after checking your connection and language model.</string>
+    <string name="action_toggle_lyrics_translation">Show translated lyrics</string>
 
 </resources>
