@@ -15,6 +15,7 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.LyricUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.security.MessageDigest
 
 data class LoadedLyrics(
     val document: LyricDocument,
@@ -24,31 +25,38 @@ data class LoadedLyrics(
 )
 
 /**
- * Resolves local lyrics once for all lyric surfaces. Translation is performed
- * per complete lyric line and the result is paired back to the same timestamped
- * line index.
+ * Resolves the selected local lyric source and translates only when the
+ * current song's own translation switch is enabled.
  */
 object LyricsDocumentLoader {
     suspend fun load(context: Context, song: Song): LoadedLyrics? =
         withContext(Dispatchers.IO) {
             val appContext = context.applicationContext
-            val ttmlDocument = runCatching {
+            val selectedSource = LyricsPreferences.source(appContext, song)
+
+            fun loadTtml(): LyricDocument? = runCatching {
                 LyricUtil.getTtmlLyricsFile(song)
                     ?.takeIf { it.isFile }
                     ?.readText()
                     ?.let(TtmlLyricsParser::parse)
             }.getOrNull()
 
-            val document = ttmlDocument ?: runCatching {
+            fun loadLrc(): LyricDocument? = runCatching {
                 val lrcText = LyricUtil.getSyncedLyricsFile(song)
                     ?.takeIf { it.isFile }
                     ?.readText()
                     ?: LyricUtil.getEmbeddedSyncedLyrics(song.data)
                 lrcText?.let(LrcLyricsParser::parse)
-            }.getOrNull() ?: return@withContext null
+            }.getOrNull()
 
-            val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
-            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            val document = when (selectedSource) {
+                LyricsSource.TTML -> loadTtml()
+                LyricsSource.LRC -> loadLrc()
+                LyricsSource.AUTOMATIC -> loadTtml() ?: loadLrc()
+            } ?: return@withContext null
+
+            val translationRequested =
+                LyricsPreferences.isTranslationEnabled(appContext, song)
             if (!translationRequested) {
                 return@withContext LoadedLyrics(
                     document = document,
@@ -58,12 +66,13 @@ object LyricsDocumentLoader {
                 )
             }
 
-            val targetLanguage = preferences.getString(
-                "lyrics_translation_language",
-                "id"
-            ) ?: "id"
-            val songKey = song.data.hashCode()
-            val lyricsHash = document.lines.joinToString("|") { it.text }.hashCode()
+            val targetLanguage = PreferenceManager.getDefaultSharedPreferences(appContext)
+                .getString("lyrics_translation_language", "id") ?: "id"
+
+            val songKey = LyricsPreferences.cacheSongKey(song)
+            val lyricsHash = MessageDigest.getInstance("SHA-256")
+                .digest(document.lines.joinToString("\u001F") { it.text }.toByteArray(Charsets.UTF_8))
+                .joinToString("") { byte -> "%02x".format(byte.toInt() and 0xff) }
             val cache = LyricsTranslationCache(appContext)
 
             val cached = cache.get(songKey, targetLanguage, lyricsHash)
@@ -72,10 +81,7 @@ object LyricsDocumentLoader {
             }
 
             val translated = runCatching {
-                MlKitLyricsTranslator.translate(
-                    document.lines.map { it.text },
-                    targetLanguage
-                )
+                MlKitLyricsTranslator.translate(document.lines.map { it.text }, targetLanguage)
             }.getOrNull()?.takeIf { it.size == document.lines.size }
 
             if (translated != null) {
