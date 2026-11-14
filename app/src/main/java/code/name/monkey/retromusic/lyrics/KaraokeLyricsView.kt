@@ -257,6 +257,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
         }
         val hasProgressiveHighlight =
             active && highlightWords && line.words.isNotEmpty()
+        val isTtml = document?.sourceFormat.equals("ttml", ignoreCase = true)
 
         lyric.animate().cancel()
         lyric.setTextSize(
@@ -275,16 +276,19 @@ class KaraokeLyricsView @JvmOverloads constructor(
         )
         lyric.typeface = resolveTypeface(style.fontFamily)
         lyric.gravity = alignmentGravity()
-        // TTML uses three layers: dim neighbouring lines, a brighter grey
-        // active base, and the theme accent progressively filling timed spans.
+        // TTML is intentionally limited to two colours on every surface:
+        // inactive text stays dim, while the active timing sweep fills in white.
+        // LRC keeps its established theme-aware primary/accent treatment.
         lyric.setTextColor(
             when {
+                hasProgressiveHighlight && isTtml -> secondaryTextColor
                 hasProgressiveHighlight -> activeKaraokeBaseColor()
+                active && isTtml -> Color.WHITE
                 active -> primaryTextColor
                 else -> secondaryTextColor
             }
         )
-        lyric.text = if (active) highlightedText(line) else line.text
+        lyric.text = if (active) highlightedText(line, isTtml) else line.text
 
         val subtitle = translationViews.getOrNull(index)
         subtitle?.animate()?.cancel()
@@ -381,22 +385,21 @@ class KaraokeLyricsView @JvmOverloads constructor(
         }
     }
 
-    private fun highlightedText(line: LyricLine): CharSequence {
+    private fun highlightedText(line: LyricLine, isTtml: Boolean): CharSequence {
         if (!highlightWords || line.words.isEmpty()) return line.text
         val spannable = SpannableString(line.text)
         line.words.forEach { word ->
             val start = word.startIndex.coerceIn(0, spannable.length)
             val end = word.endIndex.coerceIn(start, spannable.length)
             if (end > start) {
-                // TTML karaoke: draw a quiet base first, then fill it with
-                // the theme accent as playback crosses the timed word.
-                val unfilled = secondaryTextColor
+                // TTML uses a dim base and a white progressive fill. Enhanced
+                // LRC retains its original blended base and theme accent.
                 spannable.setSpan(
                     ProgressiveLyricsSpan(
                         word = word,
                         positionProvider = { currentPositionMs },
-                        baseColor = activeKaraokeBaseColor(),
-                        highlightColor = accentTextColor
+                        baseColor = if (isTtml) secondaryTextColor else activeKaraokeBaseColor(),
+                        highlightColor = if (isTtml) Color.WHITE else accentTextColor
                     ),
                     start,
                     end,

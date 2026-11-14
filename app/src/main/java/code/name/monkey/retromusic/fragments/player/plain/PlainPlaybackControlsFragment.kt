@@ -102,6 +102,18 @@ class PlainPlaybackControlsFragment :
         setUpPlayPauseFab()
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.repeatButton.setOnClickListener {
+            MusicPlayerRemote.cycleRepeatMode()
+            it.showBounceAnimation()
+        }
+        binding.shuffleButton.setOnClickListener {
+            MusicPlayerRemote.toggleShuffleMode()
+            it.showBounceAnimation()
+        }
+    }
+
     private fun setUpPlayPauseFab() {
         binding.playPauseButton.setOnClickListener {
             if (MusicPlayerRemote.isPlaying) {

@@ -1,7 +1,10 @@
 package code.name.monkey.retromusic.fragments.player
 
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Outline
+import android.graphics.PorterDuff
+import android.widget.ImageView
 import android.view.Gravity
 import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver
@@ -39,6 +42,8 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     private var lyricsLoadJob: Job? = null
     private var artworkBoundsRoot: View? = null
     private var artworkBoundsObserver: ViewTreeObserver.OnGlobalLayoutListener? = null
+    private var dimmedArtwork: ImageView? = null
+    private var originalArtworkColorFilter: android.graphics.ColorFilter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -115,6 +120,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         binding.playerLyrics.isVisible = visible
         if (!visible) {
             binding.playerLyrics.alpha = 0f
+            restoreArtworkDimming()
         } else {
             binding.playerLyrics.alpha = 1f
             binding.root.post { updateLyricsBounds() }
@@ -144,14 +150,42 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     }
 
     /**
+     * Darken the existing album artwork pixels, not a second backdrop layered
+     * above the cover. The original filter is restored when lyrics are hidden
+     * or the ViewPager switches to a different artwork view.
+     */
+    private fun applyArtworkDimming(artwork: ImageView) {
+        if (!binding.playerLyrics.isVisible) {
+            restoreArtworkDimming()
+            return
+        }
+        if (dimmedArtwork !== artwork) {
+            restoreArtworkDimming()
+            dimmedArtwork = artwork
+            originalArtworkColorFilter = artwork.colorFilter
+        }
+        artwork.setColorFilter(Color.argb(0x66, 0, 0, 0), PorterDuff.Mode.SRC_ATOP)
+    }
+
+    private fun restoreArtworkDimming() {
+        dimmedArtwork?.colorFilter = originalArtworkColorFilter
+        dimmedArtwork = null
+        originalArtworkColorFilter = null
+    }
+
+    /**
      * Over Cover must use the actual player_image bounds. The host player slot
      * is often taller than the square artwork, so filling the slot lets lyrics
      * escape above and below the cover.
      */
     private fun updateLyricsBounds() {
         if (_binding == null) return
-        val artwork = findCurrentArtworkView() ?: return
-        if (artwork.width <= 0 || artwork.height <= 0) return
+        val artwork = findCurrentArtworkView() as? ImageView
+        if (artwork == null || artwork.width <= 0 || artwork.height <= 0) {
+            restoreArtworkDimming()
+            return
+        }
+        applyArtworkDimming(artwork)
 
         val rootLocation = IntArray(2)
         val artworkLocation = IntArray(2)
@@ -263,6 +297,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         }
         artworkBoundsObserver = null
         artworkBoundsRoot = null
+        restoreArtworkDimming()
         _binding = null
     }
 }

@@ -34,6 +34,7 @@ import code.name.monkey.retromusic.extensions.whichFragment
 import code.name.monkey.retromusic.fragments.MusicSeekSkipTouchListener
 import code.name.monkey.retromusic.fragments.other.VolumeFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
+import code.name.monkey.retromusic.extensions.playbackBounceAnimation
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
 import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.util.MusicUtil
@@ -163,26 +164,7 @@ abstract class AbsPlayerControlsFragment(@LayoutRes layout: Int) : AbsMusicServi
     }
 
     fun View.showBounceAnimation() {
-        clearAnimation()
-        scaleX = 0.9f
-        scaleY = 0.9f
-        isVisible = true
-        pivotX = (width / 2).toFloat()
-        pivotY = (height / 2).toFloat()
-
-        animate().setDuration(200)
-            .setInterpolator(DecelerateInterpolator())
-            .scaleX(1.1f)
-            .scaleY(1.1f)
-            .withEndAction {
-                animate().setDuration(200)
-                    .setInterpolator(AccelerateInterpolator())
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .alpha(1f)
-                    .start()
-            }
-            .start()
+        playbackBounceAnimation()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

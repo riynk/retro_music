@@ -23,7 +23,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
+import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.annotation.ColorInt
@@ -45,6 +47,32 @@ import com.google.android.material.navigationrail.NavigationRailView
 import dev.chrisbanes.insetter.applyInsetter
 
 const val ANIM_DURATION = 300L
+
+/**
+ * Shared press animation for playback and quick-action icons across player themes.
+ */
+fun View.playbackBounceAnimation() {
+    clearAnimation()
+    scaleX = 0.9f
+    scaleY = 0.9f
+    isVisible = true
+    pivotX = width / 2f
+    pivotY = height / 2f
+
+    animate().setDuration(200)
+        .setInterpolator(DecelerateInterpolator())
+        .scaleX(1.1f)
+        .scaleY(1.1f)
+        .withEndAction {
+            animate().setDuration(200)
+                .setInterpolator(AccelerateInterpolator())
+                .scaleX(1f)
+                .scaleY(1f)
+                .alpha(1f)
+                .start()
+        }
+        .start()
+}
 
 @Suppress("UNCHECKED_CAST")
 fun <T : View> ViewGroup.inflate(@LayoutRes layout: Int): T {
