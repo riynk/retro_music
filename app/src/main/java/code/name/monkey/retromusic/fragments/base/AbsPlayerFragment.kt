@@ -290,8 +290,14 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
 
     private fun refreshLyricsMenuState() {
         val context = context ?: return
+        // Do not call the abstract playerToolbar() accessor here. Some subclasses
+        // back it with lateinit ViewBinding that is initialized only after
+        // super.onViewCreated() returns.
+        val toolbar = view?.findViewById<Toolbar>(R.id.playerToolbar) ?: return
+        val menu = toolbar.menu
+        if (menu.size() == 0) return
+
         val song = MusicPlayerRemote.currentSong
-        val menu = playerToolbar()?.menu ?: return
         menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
             LyricsPreferences.isTranslationEnabled(context, song)
         menu.findItem(R.id.action_choose_lyrics_source)?.title =
@@ -368,8 +374,9 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
         }
         playerAlbumCoverFragment = whichFragment(R.id.playerAlbumCoverFragment)
         playerAlbumCoverFragment?.setCallbacks(this)
-        refreshLyricsMenuState()
 
+        // The concrete PlayerFragment initializes its ViewBinding and inflates
+        // the toolbar menu after this superclass callback has returned.
         view.findViewById<RelativeLayout>(R.id.statusBarShadow)?.hide()
     }
 
