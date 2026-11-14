@@ -123,7 +123,6 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         updateHelper = MusicProgressViewUpdateHelper(this, 500, 1000)
         updateTitleSong()
         setupLyricsView()
-        loadLyrics()
 
         setupWakelock()
         setupViews()
@@ -432,6 +431,8 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onResume() {
         super.onResume()
         updateHelper.start()
+        // Refresh lyric display settings when returning from Settings.
+        loadLyrics()
     }
 
     override fun onPause() {
