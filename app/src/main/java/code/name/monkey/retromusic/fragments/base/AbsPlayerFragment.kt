@@ -309,6 +309,8 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
         updateIsFavorite(animate = true)
     }
 
+    protected open fun onFavoriteIconUpdated(isFavorite: Boolean, animate: Boolean) = Unit
+
     protected open fun toggleFavorite(song: Song) {
         lifecycleScope.launch(IO) {
             val playlist: PlaylistEntity = libraryViewModel.favoritePlaylist()
@@ -339,19 +341,19 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
                     icon,
                     toolbarIconColor()
                 )
-                if (playerToolbar() != null) {
-                    playerToolbar()?.menu?.findItem(R.id.action_toggle_favorite)?.apply {
-                        setIcon(drawable)
-                        title =
-                            if (isFavorite) getString(R.string.action_remove_from_favorites)
-                            else getString(R.string.action_add_to_favorites)
-                        getIcon().also {
-                            if (it is AnimatedVectorDrawable) {
-                                it.start()
-                            }
+                playerToolbar()?.menu?.findItem(R.id.action_toggle_favorite)?.apply {
+                    isChecked = isFavorite
+                    setIcon(drawable)
+                    title =
+                        if (isFavorite) getString(R.string.action_remove_from_favorites)
+                        else getString(R.string.action_add_to_favorites)
+                    getIcon().also {
+                        if (it is AnimatedVectorDrawable) {
+                            it.start()
                         }
                     }
                 }
+                onFavoriteIconUpdated(isFavorite, animate)
             }
         }
     }

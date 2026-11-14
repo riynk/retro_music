@@ -6,6 +6,7 @@ package code.name.monkey.retromusic.fragments.player.plainatmosphere
 
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -109,6 +110,7 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
         binding.quickLyrics.isActivated = lyricsEnabled
         binding.quickFavorite.isSelected = favoriteEnabled
         binding.quickFavorite.isActivated = favoriteEnabled
+        onFavoriteIconUpdated(favoriteEnabled, animate = false)
     }
 
     private fun updateSong() {
@@ -221,6 +223,22 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
         ToolbarContentTintHelper.colorizeToolbar(binding.playerToolbar, Color.WHITE, activity)
     }
 
+    override fun onFavoriteIconUpdated(isFavorite: Boolean, animate: Boolean) {
+        if (_binding == null) return
+        binding.quickFavorite.isSelected = isFavorite
+        binding.quickFavorite.isActivated = isFavorite
+        val icon = when {
+            animate && isFavorite -> R.drawable.avd_favorite
+            animate -> R.drawable.avd_unfavorite
+            isFavorite -> R.drawable.ic_favorite
+            else -> R.drawable.ic_favorite_border
+        }
+        binding.quickFavorite.setImageResource(icon)
+        if (animate) {
+            (binding.quickFavorite.drawable as? Animatable)?.start()
+        }
+    }
+
     override fun toolbarIconColor(): Int = Color.WHITE
 
     override fun onShow() {
@@ -235,11 +253,4 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
         toggleFavorite(MusicPlayerRemote.currentSong)
     }
 
-    override fun toggleFavorite(song: Song) {
-        super.toggleFavorite(song)
-        if (song.id == MusicPlayerRemote.currentSong.id) {
-            updateIsFavorite(animate = true)
-            updateQuickActions()
-        }
-    }
 }
