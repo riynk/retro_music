@@ -40,7 +40,7 @@ private const val PLAIN_BLUR_BACKGROUND_SOURCE = "plain_blur_background_source"
 class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_atmosphere_player),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private var _binding: FragmentPlainBlurPlayerBinding? = null
+    private var _binding: FragmentPlainAtmospherePlayerBinding? = null
     private val binding get() = _binding!!
     private lateinit var controlsFragment: PlainPlaybackControlsFragment
     private var lastColor: Int = Color.WHITE
@@ -54,16 +54,22 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentPlainBlurPlayerBinding.bind(view)
+        _binding = FragmentPlainAtmospherePlayerBinding.bind(view)
         controlsFragment = whichFragment(R.id.playbackControlsFragment)
         val coverFragment: PlayerAlbumCoverFragment = whichFragment(R.id.playerAlbumCoverFragment)
         coverFragment.setCallbacks(this)
 
         binding.playerToolbar.apply {
             inflateMenu(R.menu.menu_plain_blur_overflow)
-            setOnMenuItemClickListener(this@PlainBlurPlayerFragment)
+            setOnMenuItemClickListener(this@PlainAtmospherePlayerFragment)
             ToolbarContentTintHelper.colorizeToolbar(this, Color.WHITE, requireActivity())
         }
+        binding.quickLyrics.setOnClickListener { performQuickAction(R.id.action_toggle_lyrics) }
+        binding.quickFavorite.setOnClickListener { performQuickAction(R.id.action_toggle_favorite) }
+        binding.quickSleepTimer.setOnClickListener { performQuickAction(R.id.action_sleep_timer) }
+        binding.quickQueue.setOnClickListener { performQuickAction(R.id.now_playing) }
+        updateQuickActions()
+
         binding.title.isSelected = true
         binding.text.isSelected = true
         binding.title.setOnClickListener { goToAlbum(requireActivity()) }
@@ -71,6 +77,19 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
 
         updateSong()
         updateBlurBackground()
+    }
+
+    private fun performQuickAction(actionId: Int) {
+        val item = binding.playerToolbar.menu.findItem(actionId) ?: return
+        onMenuItemClick(item)
+        updateQuickActions()
+    }
+
+    private fun updateQuickActions() {
+        if (_binding == null) return
+        binding.quickLyrics.isSelected = PreferenceUtil.showLyrics
+        binding.quickFavorite.isSelected =
+            binding.playerToolbar.menu.findItem(R.id.action_toggle_favorite)?.isChecked == true
     }
 
     private fun updateSong() {
@@ -137,12 +156,14 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
         super.onServiceConnected()
         updateSong()
         updateBlurBackground()
+        updateQuickActions()
     }
 
     override fun onPlayingMetaChanged() {
         super.onPlayingMetaChanged()
         updateSong()
         updateBlurBackground()
+        updateQuickActions()
     }
 
     override fun onResume() {
@@ -151,6 +172,7 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
             .registerOnSharedPreferenceChangeListener(this)
         updateSong()
         updateBlurBackground()
+        updateQuickActions()
     }
 
     override fun onPause() {
