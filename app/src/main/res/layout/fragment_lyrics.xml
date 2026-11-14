@@ -69,6 +69,13 @@
             app:lrcTextGravity="left"
             app:lrcTextSize="28sp" />
 
+        <code.name.monkey.retromusic.lyrics.KaraokeLyricsView
+            android:id="@+id/karaokeLyricsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/noLyricsFound"
             android:layout_width="match_parent"

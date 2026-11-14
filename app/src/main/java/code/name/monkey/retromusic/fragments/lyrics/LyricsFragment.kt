@@ -26,6 +26,16 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
+import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
+import code.name.monkey.retromusic.lyrics.model.LyricDocument
+import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
+import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
+import code.name.monkey.retromusic.lyrics.translation.LyricsTranslationCache
+import code.name.monkey.retromusic.lyrics.translation.MlKitLyricsTranslator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import androidx.navigation.fragment.findNavController
 import androidx.transition.Fade
 import code.name.monkey.appthemehelper.common.ATHToolbarActivity
@@ -82,6 +92,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         }
 
     private lateinit var updateHelper: MusicProgressViewUpdateHelper
+    private var lyricsLoadJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,13 +145,16 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     override fun onUpdateProgressViews(progress: Int, total: Int) {
         binding.lyricsView.updateTime(progress.toLong())
+        if (binding.karaokeLyricsView.isVisible) {
+            binding.karaokeLyricsView.updateTime(progress.toLong())
+        }
     }
 
     private fun setupViews() {
         binding.editButton.accentColor()
         binding.editButton.setOnClickListener {
             when (lyricsType) {
-                LyricsType.SYNCED_LYRICS -> {
+                LyricsType.SYNCED_LYRICS, LyricsType.ENHANCED_LYRICS -> {
                     editSyncedLyrics()
                 }
                 LyricsType.NORMAL_LYRICS -> {
@@ -298,7 +312,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                 }
             }
             positiveButton(res = R.string.save) {
-                loadLRCLyrics()
+                loadLyrics()
             }
             negativeButton(res = android.R.string.cancel)
         }
@@ -337,15 +351,80 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     }
 
     private fun loadLyrics() {
-        lyricsType = if (!loadLRCLyrics()) {
-            binding.lyricsView.isVisible = false
-            loadNormalLyrics()
-            LyricsType.NORMAL_LYRICS
-        } else {
-            binding.normalLyrics.isVisible = false
-            binding.noLyricsFound.isVisible = false
-            binding.lyricsView.isVisible = true
-            LyricsType.SYNCED_LYRICS
+        if (_binding == null) return
+        lyricsLoadJob?.cancel()
+        val currentSong = song
+        lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
+            val advancedLyrics = withContext(Dispatchers.IO) {
+                val ttmlFile = LyricUtil.getTtmlLyricsFile(currentSong)
+                val ttmlDocument = if (ttmlFile?.isFile == true) {
+                    runCatching { TtmlLyricsParser.parse(ttmlFile.readText()) }.getOrNull()
+                } else {
+                    null
+                }
+                if (ttmlDocument != null) {
+                    ttmlDocument to true
+                } else {
+                    val lrcText = LyricUtil.getSyncedLyricsFile(currentSong)
+                        ?.takeIf { it.isFile }
+                        ?.let { runCatching { it.readText() }.getOrNull() }
+                        ?: LyricUtil.getEmbeddedSyncedLyrics(currentSong.data)
+                    val document = lrcText?.let { LrcLyricsParser.parse(it) }
+                    if (document?.hasWordTiming == true) document to false else null
+                }
+            }
+
+            if (advancedLyrics != null) {
+                val (document, isTtml) = advancedLyrics
+                val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val showTranslation = preferences.getBoolean("lyrics_show_translation", false)
+                val targetLanguage = preferences.getString("lyrics_translation_language", "id") ?: "id"
+                val cache = LyricsTranslationCache(requireContext())
+                val songKey = currentSong.data.hashCode()
+                val lyricHash = document.lines.joinToString("|") { it.text }.hashCode()
+
+                val translations = if (showTranslation) {
+                    withContext(Dispatchers.IO) {
+                        cache.get(songKey, targetLanguage, lyricHash)
+                            ?: runCatching {
+                                MlKitLyricsTranslator.translate(
+                                    document.lines.map { it.text },
+                                    targetLanguage
+                                )
+                            }.getOrNull()?.also {
+                                cache.put(songKey, targetLanguage, lyricHash, it)
+                            }
+                    }
+                } else {
+                    null
+                }
+
+                binding.karaokeLyricsView.setDocument(
+                    document,
+                    translations,
+                    preferences.getBoolean("lyrics_word_highlight", true)
+                )
+                binding.karaokeLyricsView.isVisible = true
+                binding.lyricsView.isVisible = false
+                binding.normalLyrics.isVisible = false
+                binding.noLyricsFound.isVisible = false
+                binding.editButton.isVisible = !isTtml
+                lyricsType = LyricsType.ENHANCED_LYRICS
+                return@launch
+            }
+
+            binding.karaokeLyricsView.isVisible = false
+            binding.editButton.isVisible = true
+            lyricsType = if (!loadLRCLyrics()) {
+                binding.lyricsView.isVisible = false
+                loadNormalLyrics()
+                LyricsType.NORMAL_LYRICS
+            } else {
+                binding.normalLyrics.isVisible = false
+                binding.noLyricsFound.isVisible = false
+                binding.lyricsView.isVisible = true
+                LyricsType.SYNCED_LYRICS
+            }
         }
     }
 
@@ -361,6 +440,8 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        lyricsLoadJob?.cancel()
+        lyricsLoadJob = null
         if (MusicPlayerRemote.playingQueue.isNotEmpty())
             mainActivity.expandPanel()
         _binding = null
@@ -368,6 +449,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     enum class LyricsType {
         NORMAL_LYRICS,
-        SYNCED_LYRICS
+        SYNCED_LYRICS,
+        ENHANCED_LYRICS
     }
 }

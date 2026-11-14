@@ -161,6 +161,13 @@ object LyricUtil {
         }
     }
 
+    fun getTtmlLyricsFile(song: Song): File? {
+        val audioFile = File(song.data)
+        val localFile = audioFile.parentFile?.resolve(audioFile.nameWithoutExtension + ".ttml")
+        val libraryFile = File(lrcRootPath, song.title + " - " + song.artistName + ".ttml")
+        return listOfNotNull(localFile, libraryFile).firstOrNull { it.isFile }
+    }
+
     fun getEmbeddedSyncedLyrics(data: String): String? {
         val embeddedLyrics = try {
             AudioFileIO.read(File(data)).tagOrCreateDefault.getFirst(FieldKey.LYRICS)
