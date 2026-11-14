@@ -8,10 +8,12 @@ import android.content.Context
 import org.json.JSONArray
 
 class LyricsTranslationCache(context: Context) {
-    private val preferences = context.getSharedPreferences("lyrics_translation_cache", Context.MODE_PRIVATE)
+    private val preferences =
+        context.getSharedPreferences("lyrics_translation_cache", Context.MODE_PRIVATE)
 
-    fun get(songKey: Int, targetLanguage: String, lyricsHash: Int): List<String>? {
-        val raw = preferences.getString(cacheKey(songKey, targetLanguage, lyricsHash), null) ?: return null
+    fun get(songKey: String, targetLanguage: String, lyricsHash: String): List<String>? {
+        val raw = preferences.getString(cacheKey(songKey, targetLanguage, lyricsHash), null)
+            ?: return null
         return try {
             val json = JSONArray(raw)
             List(json.length()) { index -> json.optString(index) }
@@ -20,7 +22,12 @@ class LyricsTranslationCache(context: Context) {
         }
     }
 
-    fun put(songKey: Int, targetLanguage: String, lyricsHash: Int, translations: List<String>) {
+    fun put(
+        songKey: String,
+        targetLanguage: String,
+        lyricsHash: String,
+        translations: List<String>
+    ) {
         val json = JSONArray()
         translations.forEach { json.put(it) }
         preferences.edit()
@@ -28,6 +35,6 @@ class LyricsTranslationCache(context: Context) {
             .apply()
     }
 
-    private fun cacheKey(songKey: Int, targetLanguage: String, lyricsHash: Int): String =
-        "song_" + songKey + "_" + targetLanguage + "_" + lyricsHash
+    private fun cacheKey(songKey: String, targetLanguage: String, lyricsHash: String): String =
+        "song_${songKey}_${targetLanguage}_${lyricsHash}"
 }
