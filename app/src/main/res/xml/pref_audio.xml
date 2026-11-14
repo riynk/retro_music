@@ -2,24 +2,23 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <code.name.monkey.retromu
-        android:icon="@drawable/ic_volume_down"sic.preferences.DurationPreference
+    <code.name.monkey.retromusic.preferences.DurationPreference
         android:defaultValue="0"
         android:key="audio_fade_duration"
         android:layout="@layout/list_item_view"
         android:summary="@string/pref_summary_audio_fade"
         android:title="@string/pref_title_audio_fade" />
 
-    <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_volume_up"s.supportv7.ATESwitchPreference
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:icon="@drawable/ic_volume_up"
         android:defaultValue="false"
         android:key="manage_audio_focus"
         android:layout="@layout/list_item_view_switch"
         android:summary="@string/pref_summary_manage_audio_focus"
         android:title="@string/pref_title_manage_audio_focus" />
 
-    <code.name.monkey.appthemehelper.common.pref
-        android:icon="@drawable/ic_repeat"s.supportv7.ATESeekBarPreference
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+        android:icon="@drawable/ic_repeat"
         android:defaultValue="0"
         android:key="cross_fade_duration"
         android:layout="@layout/list_item_view_seekbar"
