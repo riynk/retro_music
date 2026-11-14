@@ -135,6 +135,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             .registerOnSharedPreferenceChangeListener(this)
         if (PreferenceUtil.showLyrics) {
             binding.root.isVisible = true
+            progressViewUpdateHelper?.start()
             updateLyrics()
         }
     }

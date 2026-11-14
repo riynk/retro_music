@@ -248,8 +248,8 @@ class KaraokeLyricsView @JvmOverloads constructor(
     }
 
     private fun alignmentGravity(): Int = when (style.alignment) {
-        "left" -> Gravity.START or Gravity.CENTER_VERTICAL
-        "right" -> Gravity.END or Gravity.CENTER_VERTICAL
+        "left" -> Gravity.LEFT or Gravity.CENTER_VERTICAL
+        "right" -> Gravity.RIGHT or Gravity.CENTER_VERTICAL
         else -> Gravity.CENTER
     }
 
@@ -259,12 +259,11 @@ class KaraokeLyricsView @JvmOverloads constructor(
     }
 
     private fun resolveThemeColor(attribute: Int, fallback: Int): Int {
-        val value = TypedValue()
-        if (!context.theme.resolveAttribute(attribute, value, true)) return fallback
-        return if (value.resourceId != 0) {
-            runCatching { context.getColor(value.resourceId) }.getOrDefault(fallback)
-        } else {
-            value.data
+        val values = context.obtainStyledAttributes(intArrayOf(attribute))
+        return try {
+            values.getColorStateList(0)?.defaultColor ?: values.getColor(0, fallback)
+        } finally {
+            values.recycle()
         }
     }
 
