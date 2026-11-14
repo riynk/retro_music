@@ -28,7 +28,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <include layout="@layout/shadow_statusbar_toolbar" />
-    <include layout="@layout/status_bar" />
+    <include
+        layout="@layout/status_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/header"

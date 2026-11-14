@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
 import code.name.monkey.retromusic.NEW_BLUR_AMOUNT
@@ -50,6 +49,8 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
     private var lastRequest: RequestBuilder<Drawable>? = null
     private var backgroundRequest = 0
 
+    override val preserveStatusBarSpacerInFullscreen: Boolean = true
+
     override val paletteColor: Int
         get() = lastColor
 
@@ -58,11 +59,6 @@ class PlainAtmospherePlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPlainAtmospherePlayerBinding.bind(view)
-        if (PreferenceUtil.isFullScreenMode) {
-            // AbsPlayerFragment hides this spacer for immersive themes. Keep its
-            // measured height here so header text and overflow menu respect the top safe area.
-            view.findViewById<View>(R.id.status_bar)?.isVisible = true
-        }
         controlsFragment = whichFragment(R.id.playbackControlsFragment)
         val coverFragment: PlayerAlbumCoverFragment = whichFragment(R.id.playerAlbumCoverFragment)
         coverFragment.setCallbacks(this)

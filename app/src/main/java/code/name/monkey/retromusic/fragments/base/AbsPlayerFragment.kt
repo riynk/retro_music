@@ -270,6 +270,8 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
         item.icon = drawable
     }
 
+    protected open val preserveStatusBarSpacerInFullscreen: Boolean = false
+
     abstract fun playerToolbar(): Toolbar?
 
     abstract fun onShow()
@@ -369,10 +371,8 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (PreferenceUtil.isFullScreenMode &&
-            view.findViewById<View>(R.id.status_bar) != null
-        ) {
-            view.findViewById<View>(R.id.status_bar).isVisible = false
+        if (PreferenceUtil.isFullScreenMode && !preserveStatusBarSpacerInFullscreen) {
+            view.findViewById<View>(R.id.status_bar)?.isVisible = false
         }
         playerAlbumCoverFragment = whichFragment(R.id.playerAlbumCoverFragment)
         playerAlbumCoverFragment?.setCallbacks(this)
