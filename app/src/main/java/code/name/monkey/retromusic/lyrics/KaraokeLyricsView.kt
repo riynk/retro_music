@@ -107,7 +107,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
         translationStatusView = null
         translationStatus = null
         currentLine = -2
-        currentWord = -2
         currentPositionMs = 0L
         scrollTo(0, 0)
     }
@@ -143,7 +142,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
         translations = translation?.takeIf { it.size == value.lines.size }
         highlightWords = enableWordHighlight
         currentLine = -2
-        currentWord = -2
         lineViews.clear()
         translationViews.clear()
         translationStatusView = null
