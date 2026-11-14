@@ -66,6 +66,7 @@ import code.name.monkey.retromusic.fragments.ReloadType
 import code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IPaletteColorHolder
+import code.name.monkey.retromusic.lyrics.LyricsPreferences
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.repository.RealRepository
 import code.name.monkey.retromusic.service.MusicService
@@ -118,10 +119,16 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
             }
 
             R.id.action_toggle_lyrics_translation -> {
-                val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val enabled = !preferences.getBoolean("lyrics_show_translation", false)
-                preferences.edit().putBoolean("lyrics_show_translation", enabled).apply()
+                val enabled = !LyricsPreferences.isTranslationEnabled(requireContext(), song)
+                LyricsPreferences.setTranslationEnabled(requireContext(), song, enabled)
                 item.isChecked = enabled
+                return true
+            }
+
+            R.id.action_choose_lyrics_source -> {
+                LyricsPreferences.showSourcePicker(requireContext(), song) {
+                    refreshLyricsMenuState()
+                }
                 return true
             }
 
@@ -273,10 +280,23 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
 
     override fun onServiceConnected() {
         updateIsFavorite()
+        refreshLyricsMenuState()
     }
 
     override fun onPlayingMetaChanged() {
         updateIsFavorite()
+        refreshLyricsMenuState()
+    }
+
+    private fun refreshLyricsMenuState() {
+        val context = context ?: return
+        val song = MusicPlayerRemote.currentSong
+        val menu = playerToolbar()?.menu ?: return
+        menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
+            LyricsPreferences.isTranslationEnabled(context, song)
+        menu.findItem(R.id.action_choose_lyrics_source)?.title =
+            getString(R.string.action_choose_lyrics_source) + " — " +
+                getString(LyricsPreferences.source(context, song).titleRes)
     }
 
     override fun onFavoriteStateChanged() {
@@ -348,6 +368,7 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
         }
         playerAlbumCoverFragment = whichFragment(R.id.playerAlbumCoverFragment)
         playerAlbumCoverFragment?.setCallbacks(this)
+        refreshLyricsMenuState()
 
         view.findViewById<RelativeLayout>(R.id.statusBarShadow)?.hide()
     }
@@ -359,9 +380,7 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
             isChecked = PreferenceUtil.showLyrics
             showLyricsIcon(this)
         }
-        playerToolbar()?.menu?.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getBoolean("lyrics_show_translation", false)
+        refreshLyricsMenuState()
     }
 
     override fun onStart() {

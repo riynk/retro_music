@@ -49,6 +49,7 @@ import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
 import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
 import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
 import code.name.monkey.retromusic.lyrics.LyricsDocumentLoader
+import code.name.monkey.retromusic.lyrics.LyricsPreferences
 import code.name.monkey.retromusic.lyrics.LyricsSurface
 import code.name.monkey.retromusic.transform.CarousalPagerTransformer
 import code.name.monkey.retromusic.transform.ParallaxPagerTransformer
@@ -122,7 +123,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
         lyricsLoadJob?.cancel()
         lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
             val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            val translationRequested = LyricsPreferences.isTranslationEnabled(requireContext(), song)
             lrcView.setTranslationStatus(
                 if (translationRequested) getString(R.string.lyrics_translation_loading) else null
             )

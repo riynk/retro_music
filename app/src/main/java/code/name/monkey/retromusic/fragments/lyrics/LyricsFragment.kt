@@ -31,6 +31,8 @@ import androidx.preference.PreferenceManager
 import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
 import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
 import code.name.monkey.retromusic.lyrics.LyricsSurface
+import code.name.monkey.retromusic.lyrics.LyricsPreferences
+import code.name.monkey.retromusic.lyrics.LyricsSource
 import code.name.monkey.retromusic.lyrics.LyricsDocumentLoader
 import code.name.monkey.retromusic.lyrics.model.LyricDocument
 import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
@@ -206,8 +208,10 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lyrics, menu)
         menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getBoolean("lyrics_show_translation", false)
+            LyricsPreferences.isTranslationEnabled(requireContext(), song)
+        menu.findItem(R.id.action_choose_lyrics_source)?.title =
+            getString(R.string.action_choose_lyrics_source) + " — " +
+                getString(LyricsPreferences.source(requireContext(), song).titleRes)
         ToolbarContentTintHelper.handleOnCreateOptionsMenu(
             requireContext(),
             binding.toolbar,
@@ -222,11 +226,17 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
             true
         }
         R.id.action_toggle_lyrics_translation -> {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val enabled = !preferences.getBoolean("lyrics_show_translation", false)
-            preferences.edit().putBoolean("lyrics_show_translation", enabled).apply()
+            val enabled = !LyricsPreferences.isTranslationEnabled(requireContext(), song)
+            LyricsPreferences.setTranslationEnabled(requireContext(), song, enabled)
             item.isChecked = enabled
             loadLyrics()
+            true
+        }
+        R.id.action_choose_lyrics_source -> {
+            LyricsPreferences.showSourcePicker(requireContext(), song) {
+                loadLyrics()
+                mainActivity.invalidateOptionsMenu()
+            }
             true
         }
         else -> false
@@ -389,7 +399,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         val currentSong = song
         lyricsLoadJob = viewLifecycleOwner.lifecycleScope.launch {
             val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val translationRequested = preferences.getBoolean("lyrics_show_translation", false)
+            val translationRequested = LyricsPreferences.isTranslationEnabled(requireContext(), currentSong)
             binding.karaokeLyricsView.setTranslationStatus(
                 if (translationRequested) getString(R.string.lyrics_translation_loading) else null
             )
@@ -422,6 +432,18 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
             }
 
             binding.karaokeLyricsView.setTranslationStatus(null)
+            if (LyricsPreferences.source(requireContext(), currentSong) == LyricsSource.TTML) {
+                binding.karaokeLyricsView.setEmptyMessage(
+                    getString(R.string.lyrics_source_ttml_missing)
+                )
+                binding.karaokeLyricsView.isVisible = true
+                binding.lyricsView.isVisible = false
+                binding.normalLyrics.isVisible = false
+                binding.noLyricsFound.isVisible = false
+                binding.editButton.isVisible = false
+                lyricsType = LyricsType.ADVANCED_LYRICS
+                return@launch
+            }
             binding.karaokeLyricsView.isVisible = false
             binding.editButton.isVisible = true
             lyricsType = if (!loadLRCLyrics()) {
