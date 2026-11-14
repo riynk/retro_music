@@ -200,6 +200,18 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         }
     }
 
+    private fun setLyricsSourceSubtitle(sourceFormat: String?, hasWordTiming: Boolean = false) {
+        binding.toolbar.subtitle = when {
+            sourceFormat == "ttml" && hasWordTiming ->
+                getString(R.string.lyrics_status_ttml_words)
+            sourceFormat == "ttml" ->
+                getString(R.string.lyrics_status_ttml_lines)
+            sourceFormat == "lrc" ->
+                getString(R.string.lyrics_status_lrc_lines)
+            else -> null
+        }
+    }
+
     private fun refreshLyricsMenu() {
         val menu = binding.toolbar.menu
         menu.findItem(R.id.action_toggle_lyrics_translation)?.isChecked =
@@ -427,6 +439,10 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                     loaded.translations,
                     preferences.getBoolean("lyrics_word_highlight", true)
                 )
+                setLyricsSourceSubtitle(
+                    loaded.document.sourceFormat,
+                    loaded.document.hasWordTiming
+                )
                 binding.karaokeLyricsView.isVisible = true
                 binding.lyricsView.isVisible = false
                 binding.normalLyrics.isVisible = false
@@ -440,6 +456,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
             binding.karaokeLyricsView.setTranslationStatus(null)
             if (LyricsPreferences.source(requireContext(), currentSong) == LyricsSource.TTML) {
+                setLyricsSourceSubtitle("ttml")
                 binding.karaokeLyricsView.setEmptyMessage(
                     getString(R.string.lyrics_source_ttml_missing)
                 )
@@ -453,7 +470,9 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
             }
             binding.karaokeLyricsView.isVisible = false
             binding.editButton.isVisible = true
-            lyricsType = if (!loadLRCLyrics()) {
+            val hasSyncedLrc = loadLRCLyrics()
+            setLyricsSourceSubtitle(if (hasSyncedLrc) "lrc" else null)
+            lyricsType = if (!hasSyncedLrc) {
                 binding.lyricsView.isVisible = false
                 loadNormalLyrics()
                 LyricsType.NORMAL_LYRICS

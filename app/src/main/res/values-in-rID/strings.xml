@@ -360,6 +360,9 @@
     <string name="lyrics_source_auto">Otomatis (utamakan TTML)</string>
     <string name="lyrics_source_lrc">LRC</string>
     <string name="lyrics_source_ttml">TTML</string>
+    <string name="lyrics_status_ttml_words">TTML · karaoke tersinkron per kata</string>
+    <string name="lyrics_status_ttml_lines">TTML · tersinkron per baris (tanpa timestamp kata)</string>
+    <string name="lyrics_status_lrc_lines">LRC · tersinkron per baris</string>
     <string name="lyrics_source_ttml_missing">File lirik TTML tidak ditemukan. Pilih Otomatis atau LRC untuk memakai sumber lain yang tersedia.</string>
     <string name="pref_lyrics_translation_language_summary">Bahasa tujuan yang digunakan saat terjemahan diaktifkan untuk lagu tertentu.</string>
     <string name="lyrics_translation_loading">Menyiapkan terjemahan di perangkat untuk lagu ini…</string>

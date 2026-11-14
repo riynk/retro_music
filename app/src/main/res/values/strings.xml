@@ -551,6 +551,9 @@
     <string name="lyrics_source_auto">Automatic (prefer TTML)</string>
     <string name="lyrics_source_lrc">LRC</string>
     <string name="lyrics_source_ttml">TTML</string>
+    <string name="lyrics_status_ttml_words">TTML · word-synced karaoke</string>
+    <string name="lyrics_status_ttml_lines">TTML · line-synced (no word timestamps)</string>
+    <string name="lyrics_status_lrc_lines">LRC · line-synced</string>
     <string name="lyrics_source_ttml_missing">No TTML lyric file found. Choose Automatic or LRC to use another available source.</string>
     <string name="pref_lyrics_translation_language_summary">Default target language used when translation is enabled for an individual song</string>
 

@@ -62,7 +62,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             setOnTranslationRetryListener { updateLyrics() }
         }
 
-        binding.root.isVisible = PreferenceUtil.showLyrics
+        setLyricsOverlayVisible(PreferenceUtil.showLyrics)
         if (PreferenceUtil.showLyrics) {
             progressViewUpdateHelper?.start()
             updateLyrics()
@@ -79,7 +79,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         when {
             key == SHOW_LYRICS -> {
                 val enabled = sharedPreferences.getBoolean(SHOW_LYRICS, false)
-                binding.root.isVisible = enabled
+                setLyricsOverlayVisible(enabled)
                 if (enabled) {
                     progressViewUpdateHelper?.start()
                     updateLyrics()
@@ -105,6 +105,19 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     override fun onServiceConnected() {
         super.onServiceConnected()
         if (PreferenceUtil.showLyrics) updateLyrics()
+    }
+
+    private fun setLyricsOverlayVisible(visible: Boolean) {
+        // The FragmentContainerView can be visible while its child artwork overlay
+        // remains GONE from the XML default. Both levels must be made visible.
+        binding.root.isVisible = visible
+        binding.playerLyrics.isVisible = visible
+        if (!visible) {
+            binding.playerLyrics.alpha = 0f
+        } else {
+            binding.playerLyrics.alpha = 1f
+            binding.root.post { updateLyricsBounds() }
+        }
     }
 
     private fun attachArtworkBoundsTracking() {
@@ -225,7 +238,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         PreferenceManager.getDefaultSharedPreferences(requireContext())
             .registerOnSharedPreferenceChangeListener(this)
         if (PreferenceUtil.showLyrics) {
-            binding.root.isVisible = true
+            setLyricsOverlayVisible(true)
             progressViewUpdateHelper?.start()
             updateLyrics()
         }
