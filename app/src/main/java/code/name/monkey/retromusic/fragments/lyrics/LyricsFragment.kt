@@ -17,6 +17,8 @@ package code.name.monkey.retromusic.fragments.lyrics
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Typeface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -55,6 +57,11 @@ import code.name.monkey.retromusic.extensions.materialDialog
 import code.name.monkey.retromusic.extensions.openUrl
 import code.name.monkey.retromusic.extensions.uri
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
+import code.name.monkey.retromusic.fragments.NowPlayingScreen
+import code.name.monkey.retromusic.glide.BlurTransformation
+import code.name.monkey.retromusic.glide.RetroGlideExtension
+import code.name.monkey.retromusic.glide.RetroGlideExtension.artistImageOptions
+import code.name.monkey.retromusic.glide.RetroGlideExtension.simpleSongCoverOptions
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
 import code.name.monkey.retromusic.lyrics.LrcView
@@ -63,7 +70,9 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.FileUtils
 import code.name.monkey.retromusic.util.LyricUtil
 import code.name.monkey.retromusic.util.UriUtil
+import code.name.monkey.retromusic.util.PreferenceUtil
 import com.afollestad.materialdialogs.input.input
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
@@ -99,6 +108,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     private lateinit var updateHelper: MusicProgressViewUpdateHelper
     private var lyricsLoadJob: Job? = null
+    private var lyricsBackgroundRequest = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,6 +143,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         setupWakelock()
         setupViews()
         setupToolbar()
+        updateLyricsBackground()
     }
 
     private fun setupLyricsView() {
@@ -177,6 +188,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onPlayingMetaChanged() {
         super.onPlayingMetaChanged()
         updateTitleSong()
+        updateLyricsBackground()
         refreshLyricsMenu()
         loadLyrics()
     }
@@ -197,6 +209,61 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         ToolbarContentTintHelper.colorBackButton(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
+        }
+    }
+
+    private fun updateLyricsBackground() {
+        if (_binding == null) return
+        val enabled = PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur
+        binding.lyricsBackground.isVisible = enabled
+        binding.lyricsBackgroundScrim.isVisible = enabled
+        if (!enabled) return
+
+        binding.appBarLayout.setBackgroundColor(Color.TRANSPARENT)
+        binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
+        binding.toolbar.setTitleTextColor(Color.WHITE)
+        ToolbarContentTintHelper.colorizeToolbar(binding.toolbar, Color.WHITE, requireActivity())
+        binding.normalLyrics.setTextColor(Color.WHITE)
+        binding.karaokeLyricsView.setTextColors(
+            Color.WHITE,
+            0xB3FFFFFF.toInt(),
+            accentColor()
+        )
+
+        val requestId = ++lyricsBackgroundRequest
+        val currentSong = song
+        val source = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getString("plain_blur_background_source", "album_art")
+        val blur = BlurTransformation.Builder(requireContext())
+            .blurRadius(PreferenceUtil.blurAmount.toFloat())
+            .build()
+
+        fun loadSongArtwork() {
+            if (_binding == null || requestId != lyricsBackgroundRequest) return
+            Glide.with(this)
+                .load(RetroGlideExtension.getSongModel(currentSong))
+                .simpleSongCoverOptions(currentSong)
+                .transform(blur)
+                .error(Glide.with(this).load(ColorDrawable(Color.DKGRAY)).fitCenter())
+                .into(binding.lyricsBackground)
+        }
+
+        if (source == "artist_image") {
+            libraryViewModel.artist(currentSong.artistId).observe(viewLifecycleOwner) { artist ->
+                if (_binding == null || requestId != lyricsBackgroundRequest) return@observe
+                if (artist.id == -1L) {
+                    loadSongArtwork()
+                } else {
+                    Glide.with(this)
+                        .load(RetroGlideExtension.getArtistModel(artist))
+                        .artistImageOptions(artist)
+                        .transform(blur)
+                        .error(Glide.with(this).load(ColorDrawable(Color.DKGRAY)).fitCenter())
+                        .into(binding.lyricsBackground)
+                }
+            }
+        } else {
+            loadSongArtwork()
         }
     }
 
@@ -231,12 +298,16 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lyrics, menu)
         refreshLyricsMenu()
-        ToolbarContentTintHelper.handleOnCreateOptionsMenu(
-            requireContext(),
-            binding.toolbar,
-            menu,
-            ATHToolbarActivity.getToolbarBackgroundColor(binding.toolbar)
-        )
+        if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur) {
+            ToolbarContentTintHelper.colorizeToolbar(binding.toolbar, Color.WHITE, requireActivity())
+        } else {
+            ToolbarContentTintHelper.handleOnCreateOptionsMenu(
+                requireContext(),
+                binding.toolbar,
+                menu,
+                ATHToolbarActivity.getToolbarBackgroundColor(binding.toolbar)
+            )
+        }
     }
 
     override fun onMenuItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -439,6 +510,13 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                     loaded.translations,
                     preferences.getBoolean("lyrics_word_highlight", true)
                 )
+                if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur) {
+                    binding.karaokeLyricsView.setTextColors(
+                        Color.WHITE,
+                        0xB3FFFFFF.toInt(),
+                        accentColor()
+                    )
+                }
                 setLyricsSourceSubtitle(
                     loaded.document.sourceFormat,
                     loaded.document.hasWordTiming
@@ -488,6 +566,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     override fun onResume() {
         super.onResume()
         updateTitleSong()
+        updateLyricsBackground()
         refreshLyricsMenu()
         updateHelper.start()
         // Refresh lyric display settings when returning from Settings.
@@ -501,6 +580,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        lyricsBackgroundRequest++
         lyricsLoadJob?.cancel()
         lyricsLoadJob = null
         if (MusicPlayerRemote.playingQueue.isNotEmpty()) mainActivity.expandPanel()

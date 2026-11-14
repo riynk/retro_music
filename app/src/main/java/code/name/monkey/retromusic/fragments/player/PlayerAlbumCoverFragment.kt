@@ -346,7 +346,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
                 setLRCViewColors(primaryColor, secondaryColor)
             }
             Color, Classic -> setLRCViewColors(color.primaryTextColor, color.secondaryTextColor)
-            Blur -> setLRCViewColors(
+            Blur, PlainBlur -> setLRCViewColors(
                 android.graphics.Color.WHITE,
                 ColorUtil.withAlpha(android.graphics.Color.WHITE, 0.5f)
             )

@@ -21,6 +21,7 @@ import androidx.preference.Preference
 import androidx.preference.TwoStatePreference
 import code.name.monkey.retromusic.*
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.fragments.NowPlayingScreen
 
 /**
  * @author Hemanth S (h4h13).
@@ -32,6 +33,7 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
     override fun invalidateSettings() {
         updateNowPlayingScreenSummary()
         updateAlbumCoverStyleSummary()
+        updatePlainBlurBackgroundVisibility()
 
         val carouselEffect: TwoStatePreference? = findPreference(CAROUSEL_EFFECT)
         carouselEffect?.setOnPreferenceChangeListener { _, _ ->
@@ -41,6 +43,11 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_now_playing_screen)
+    }
+
+    private fun updatePlainBlurBackgroundVisibility() {
+        findPreference<Preference>("plain_blur_background_source")?.isVisible =
+            PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainBlur
     }
 
     private fun updateAlbumCoverStyleSummary() {
@@ -70,7 +77,10 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         when (key) {
-            NOW_PLAYING_SCREEN_ID -> updateNowPlayingScreenSummary()
+            NOW_PLAYING_SCREEN_ID -> {
+                updateNowPlayingScreenSummary()
+                updatePlainBlurBackgroundVisibility()
+            }
             ALBUM_COVER_STYLE -> updateAlbumCoverStyleSummary()
             CIRCULAR_ALBUM_ART, CAROUSEL_EFFECT -> invalidateSettings()
         }

@@ -269,6 +269,11 @@
     <string name="pick_from_local_storage">Pick from local storage</string>
     <string name="pinterest_page">Pinterest</string>
     <string name="pinterest_page_summary">Follow Pinterest page for Retro Music design inspiration</string>
+    <string name="plain_blur">Plain Blur</string>
+    <string name="pref_plain_blur_background_source">Plain Blur background</string>
+    <string name="pref_plain_blur_background_summary">Choose the image used for the blurred background in Plain Blur and the lyrics page.</string>
+    <string name="plain_blur_background_album">Song artwork (metadata)</string>
+    <string name="plain_blur_background_artist">Artist image</string>
     <string name="plain">Plain</string>
     <string name="playback_pitch">Pitch</string>
     <string name="playback_settings">Playback Settings</string>
