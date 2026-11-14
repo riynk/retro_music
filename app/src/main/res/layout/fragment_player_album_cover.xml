@@ -9,9 +9,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="@integer/overScrollMode">
-
-    </androidx.viewpager.widget.ViewPager>
+        android:overScrollMode="@integer/overScrollMode" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/cover_lyrics"
@@ -28,19 +26,12 @@
         app:fel_size_bottom="100dp"
         app:fel_size_top="100dp">
 
-        <code.name.monkey.retromusic.lyrics.CoverLrcView
+        <code.name.monkey.retromusic.lyrics.KaraokeLyricsView
             android:id="@+id/lyricsView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="16dp"
             android:visibility="gone"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-            app:lrcLabel="@string/no_lyrics_found"
-            app:lrcNormalTextSize="28sp"
-            app:lrcPadding="24dp"
-            app:lrcTextGravity="center"
-            app:lrcTextSize="32sp"
-            app:lrcTimelineColor="@color/transparent"
             tools:visibility="visible" />
     </com.bosphere.fadingedgelayout.FadingEdgeLayout>
 </FrameLayout>

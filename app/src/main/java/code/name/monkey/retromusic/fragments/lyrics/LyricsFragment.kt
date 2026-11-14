@@ -16,6 +16,7 @@ package code.name.monkey.retromusic.fragments.lyrics
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,6 +29,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import code.name.monkey.retromusic.lyrics.KaraokeLyricsView
+import code.name.monkey.retromusic.lyrics.LyricsDisplaySettings
+import code.name.monkey.retromusic.lyrics.LyricsSurface
 import code.name.monkey.retromusic.lyrics.model.LyricDocument
 import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
 import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
@@ -130,6 +133,10 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     }
 
     private fun setupLyricsView() {
+        binding.karaokeLyricsView.apply {
+            setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.FULL_PAGE))
+            setOnLineClickListener { time -> MusicPlayerRemote.seekTo(time.toInt()) }
+        }
         binding.lyricsView.apply {
             setCurrentColor(accentColor())
             setTimeTextColor(accentColor())
@@ -327,7 +334,17 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         }
         binding.normalLyrics.isVisible = !lyrics.isNullOrEmpty()
         binding.noLyricsFound.isVisible = lyrics.isNullOrEmpty()
-        binding.normalLyrics.text = lyrics
+        val style = LyricsDisplaySettings.read(requireContext(), LyricsSurface.FULL_PAGE)
+        binding.normalLyrics.apply {
+            setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, style.textSizeSp)
+            typeface = Typeface.create(style.fontFamily, Typeface.NORMAL)
+            gravity = when (style.alignment) {
+                "left" -> Gravity.START
+                "right" -> Gravity.END
+                else -> Gravity.CENTER
+            }
+            text = lyrics
+        }
     }
 
     /**
@@ -399,6 +416,9 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                     null
                 }
 
+                binding.karaokeLyricsView.setStyle(
+                    LyricsDisplaySettings.read(requireContext(), LyricsSurface.FULL_PAGE)
+                )
                 binding.karaokeLyricsView.setDocument(
                     document,
                     translations,

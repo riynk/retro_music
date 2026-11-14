@@ -535,4 +535,13 @@
     <string name="pref_lyrics_translation">Show translation</string>
     <string name="pref_lyrics_translation_summary">Translate local lyrics on this device; language models may need to be downloaded</string>
     <string name="pref_lyrics_translation_language">Translation language</string>
+
+    <string name="pref_header_lyrics_appearance">Lyrics appearance</string>
+    <string name="pref_lyrics_replace_cover">Now Playing — Replace Cover</string>
+    <string name="pref_lyrics_over_cover">Now Playing — Over Cover</string>
+    <string name="pref_lyrics_full_page">Full lyrics page</string>
+    <string name="pref_lyrics_text_size">Text size (sp)</string>
+    <string name="pref_lyrics_font_family">Font family</string>
+    <string name="pref_lyrics_alignment">Text alignment</string>
+
 </resources>

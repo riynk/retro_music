@@ -29,6 +29,102 @@
         android:layout="@layout/list_item_view"
         android:title="@string/pref_title_lyrics_type" />
 
+
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_header_lyrics_appearance">
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+            android:layout="@layout/preference_category_title"
+            android:title="@string/pref_lyrics_replace_cover">
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+                android:defaultValue="30"
+                android:key="lyrics_replace_text_size"
+                android:layout="@layout/list_item_view_seekbar"
+                android:max="42"
+                android:min="14"
+                android:title="@string/pref_lyrics_text_size"
+                app:showSeekBarValue="true" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="sans-serif"
+                android:entries="@array/pref_lyrics_font_names"
+                android:entryValues="@array/pref_lyrics_font_values"
+                android:key="lyrics_replace_font_family"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_font_family" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="center"
+                android:entries="@array/pref_lyrics_alignment_names"
+                android:entryValues="@array/pref_lyrics_alignment_values"
+                android:key="lyrics_replace_alignment"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_alignment" />
+        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+            android:layout="@layout/preference_category_title"
+            android:title="@string/pref_lyrics_over_cover">
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+                android:defaultValue="25"
+                android:key="lyrics_over_text_size"
+                android:layout="@layout/list_item_view_seekbar"
+                android:max="42"
+                android:min="14"
+                android:title="@string/pref_lyrics_text_size"
+                app:showSeekBarValue="true" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="sans-serif"
+                android:entries="@array/pref_lyrics_font_names"
+                android:entryValues="@array/pref_lyrics_font_values"
+                android:key="lyrics_over_font_family"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_font_family" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="center"
+                android:entries="@array/pref_lyrics_alignment_names"
+                android:entryValues="@array/pref_lyrics_alignment_values"
+                android:key="lyrics_over_alignment"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_alignment" />
+        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+            android:layout="@layout/preference_category_title"
+            android:title="@string/pref_lyrics_full_page">
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+                android:defaultValue="28"
+                android:key="lyrics_page_text_size"
+                android:layout="@layout/list_item_view_seekbar"
+                android:max="42"
+                android:min="14"
+                android:title="@string/pref_lyrics_text_size"
+                app:showSeekBarValue="true" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="sans-serif"
+                android:entries="@array/pref_lyrics_font_names"
+                android:entryValues="@array/pref_lyrics_font_values"
+                android:key="lyrics_page_font_family"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_font_family" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="center"
+                android:entries="@array/pref_lyrics_alignment_names"
+                android:entryValues="@array/pref_lyrics_alignment_values"
+                android:key="lyrics_page_alignment"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_alignment" />
+        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
         android:key="screen_on_lyrics"

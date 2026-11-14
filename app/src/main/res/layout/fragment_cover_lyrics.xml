@@ -14,28 +14,10 @@
     tools:alpha="1"
     tools:visibility="visible">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/player_lyrics_line1"
+    <code.name.monkey.retromusic.lyrics.KaraokeLyricsView
+        android:id="@+id/lyricsView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:shadowColor="@color/md_black_1000"
-        android:shadowRadius="10"
-        android:textAppearance="@style/TextViewHeadline5"
-        android:textColor="@color/md_white_1000"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/player_lyrics_line2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:shadowColor="@color/md_black_1000"
-        android:shadowRadius="10"
-        android:textAppearance="@style/TextViewHeadline5"
-        android:textColor="@color/md_white_1000"
-        tools:text="@tools:sample/full_names[5]" />
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never" />
 </FrameLayout>
