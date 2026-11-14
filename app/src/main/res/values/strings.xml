@@ -534,7 +534,7 @@
     <string name="pref_lyrics_word_highlight">Word-by-word highlighting</string>
     <string name="pref_lyrics_word_highlight_summary">Highlight timed words when the lyric file contains word-level timestamps</string>
     <string name="pref_lyrics_translation">Show translation</string>
-    <string name="pref_lyrics_translation_summary">Translate each complete lyric line into the selected language. Internet is needed once to download the Google model; translation then runs on this device</string>
+    <string name="pref_lyrics_translation_summary">Translate only the current song when enabled from the Now Playing or Lyrics menu. The translation model is downloaded once and then runs on this device</string>
     <string name="pref_lyrics_translation_language">Translation language</string>
 
     <string name="pref_header_lyrics_appearance">Lyrics appearance</string>
@@ -546,6 +546,12 @@
     <string name="pref_lyrics_alignment">Text alignment</string>
     <string name="lyrics_translation_loading">Preparing Google on-device translation…</string>
     <string name="lyrics_translation_failed">Translation could not start. Tap here to retry after checking your connection and language model.</string>
-    <string name="action_toggle_lyrics_translation">Show translated lyrics</string>
+    <string name="action_toggle_lyrics_translation">Translate this song</string>
+    <string name="action_choose_lyrics_source">Choose lyric source</string>
+    <string name="lyrics_source_auto">Automatic (prefer TTML)</string>
+    <string name="lyrics_source_lrc">LRC</string>
+    <string name="lyrics_source_ttml">TTML</string>
+    <string name="lyrics_source_ttml_missing">No TTML lyric file found. Choose Automatic or LRC to use another available source.</string>
+    <string name="pref_lyrics_translation_language_summary">Default target language used when translation is enabled for an individual song</string>
 
 </resources>
