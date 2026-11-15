@@ -82,7 +82,8 @@ class KaraokeLyricsView @JvmOverloads constructor(
         style = value
         applyAlignment()
         document?.let { renderLines(it, currentLine) }
-        translationStatusView?.typeface = resolveTypeface(style.fontFamily)
+        translationStatusView?.typeface = resolveTypeface(style.translationFontFamily)
+        translationStatusView?.setTextColor(translationTextColor())
     }
 
     /**
@@ -90,7 +91,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
      * artwork overlay so the lyric surface never turns into a full-page list.
      */
     fun setCompactLineCount(count: Int) {
-        val normalized = count.coerceIn(1, 5)
+        val normalized = count.coerceIn(1, 4)
         if (compactLineCount == normalized) return
         compactLineCount = normalized
         document?.let { renderLines(it, currentLine) }
@@ -307,7 +308,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
         if (subtitle != null) {
             subtitle.setTextSize(
                 TypedValue.COMPLEX_UNIT_SP,
-                (style.textSizeSp * if (compact) 0.48f else 0.58f).coerceAtLeast(11f)
+                style.translationTextSizeSp * if (compact) 0.9f else 1f
             )
             subtitle.setPadding(
                 dp(12),
@@ -315,9 +316,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
                 dp(12),
                 if (compact) dp(5) else dp(16)
             )
-            subtitle.typeface = resolveTypeface(style.fontFamily)
+            subtitle.typeface = resolveTypeface(style.translationFontFamily)
             subtitle.gravity = alignmentGravity()
-            subtitle.setTextColor(inactiveColor)
+            subtitle.setTextColor(translationTextColor())
         }
 
         if (compact) {
@@ -380,6 +381,16 @@ class KaraokeLyricsView @JvmOverloads constructor(
         }
     }
 
+    private fun translationTextColor(): Int = when (style.translationColor) {
+        "white" -> Color.WHITE
+        "silver" -> 0xFFE0E0E0.toInt()
+        "cyan" -> 0xFF80DEEA.toInt()
+        "pink" -> 0xFFFF80AB.toInt()
+        "amber" -> 0xFFFFD180.toInt()
+        "mint" -> 0xFFA5D6A7.toInt()
+        else -> secondaryTextColor
+    }
+
     private fun inactiveTextColor(isTtml: Boolean): Int =
         if (isTtml) TTML_INACTIVE_TEXT_COLOR else secondaryTextColor
 
@@ -437,11 +448,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
         val status = TextView(context).apply {
             text = message
             gravity = alignmentGravity()
-            typeface = resolveTypeface(style.fontFamily)
+            typeface = resolveTypeface(style.translationFontFamily)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            setTextColor(
-                inactiveTextColor(document?.sourceFormat.equals("ttml", ignoreCase = true))
-            )
+            setTextColor(translationTextColor())
             alpha = 0.9f
             setPadding(dp(12), dp(8), dp(12), dp(12))
             isClickable = translationRetryListener != null

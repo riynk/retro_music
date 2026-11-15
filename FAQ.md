@@ -42,4 +42,4 @@ Please search existing issues before opening a new report.
 
 ## Where is the source code and license?
 
-The project source is maintained in the [RSOUNDS repository](https://github.com/riynk/retro_music). Review [LICENSE.md](https://github.com/riynk/retro_music/blob/RS_DEV/LICENSE.md) and the copyright or license notices included with individual files and dependencies.
+The project source is maintained in the [RSOUNDS repository](https://github.com/riynk/retro_music). Review [LICENSE.md](https://github.com/riynk/retro_music/blob/RSOUND/LICENSE.md) and the copyright or license notices included with individual files and dependencies.

@@ -20,7 +20,10 @@ data class LyricsDisplayStyle(
     val textSizeSp: Float = 28f,
     val fontFamily: String = "sans-serif",
     val alignment: String = "center",
-    val lineSpacingDp: Int = 5
+    val lineSpacingDp: Int = 5,
+    val translationTextSizeSp: Float = 14f,
+    val translationFontFamily: String = "sans-serif",
+    val translationColor: String = "theme"
 )
 
 object LyricsDisplaySettings {
@@ -36,7 +39,15 @@ object LyricsDisplaySettings {
                 ?.takeIf { it.isNotBlank() } ?: "sans-serif",
             alignment = preferences.getString("${prefix}_alignment", "center")
                 ?.takeIf { it in setOf("left", "center", "right") } ?: "center",
-            lineSpacingDp = preferences.getInt("lyrics_line_spacing", 5).coerceIn(0, 20)
+            lineSpacingDp = preferences.getInt("lyrics_line_spacing", 5).coerceIn(0, 20),
+            translationTextSizeSp = preferences.getInt("lyrics_translation_text_size", 14)
+                .coerceIn(10, 30).toFloat(),
+            translationFontFamily = preferences.getString(
+                "lyrics_translation_font_family", "sans-serif"
+            )?.takeIf { it.isNotBlank() } ?: "sans-serif",
+            translationColor = preferences.getString("lyrics_translation_color", "theme")
+                ?.takeIf { it in setOf("theme", "white", "silver", "cyan", "pink", "amber", "mint") }
+                ?: "theme"
         )
     }
 }

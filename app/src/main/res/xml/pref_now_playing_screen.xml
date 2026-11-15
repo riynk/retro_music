@@ -83,7 +83,32 @@
                 android:layout="@layout/list_item_view"
                 android:title="@string/pref_lyrics_translation_language"
                 android:summary="@string/pref_lyrics_translation_language_summary" />
-        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+        
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="sans-serif"
+                android:entries="@array/pref_lyrics_font_names"
+                android:entryValues="@array/pref_lyrics_font_values"
+                android:key="lyrics_translation_font_family"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_translation_font_family" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+                android:defaultValue="14"
+                android:key="lyrics_translation_text_size"
+                android:layout="@layout/list_item_view_seekbar"
+                android:max="30"
+                android:min="10"
+                android:title="@string/pref_lyrics_translation_text_size"
+                app:showSeekBarValue="true" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="theme"
+                android:entries="@array/pref_lyrics_translation_color_names"
+                android:entryValues="@array/pref_lyrics_translation_color_values"
+                android:key="lyrics_translation_color"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_translation_color" />
+</code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
     
 
         <androidx.preference.PreferenceScreen
@@ -146,7 +171,17 @@
                         android:title="@string/pref_lyrics_text_size"
                         app:showSeekBarValue="true" />
         
-                    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+            android:defaultValue="45"
+            android:key="lyrics_over_artwork_dim"
+            android:layout="@layout/list_item_view_seekbar"
+            android:max="80"
+            android:min="0"
+            android:title="@string/pref_lyrics_over_artwork_dim"
+            android:summary="@string/pref_lyrics_over_artwork_dim_summary"
+            app:showSeekBarValue="true" />
+
+<code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
                         android:defaultValue="3"
                         android:entries="@array/pref_lyrics_line_count_names"
                         android:entryValues="@array/pref_lyrics_line_count_values"

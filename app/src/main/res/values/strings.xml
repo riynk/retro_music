@@ -556,7 +556,7 @@
     <string name="pref_lyrics_line_spacing">Line spacing (dp)</string>
     <string name="pref_lyrics_line_spacing_summary">Adjust the vertical space between lyric lines</string>
     <string name="pref_lyrics_visible_lines">Visible lyric lines</string>
-    <string name="pref_lyrics_visible_lines_summary">Choose how many lyric lines appear over the album cover</string>
+    <string name="pref_lyrics_visible_lines_summary">Choose how many lyric lines appear over the album cover (1–4)</string>
     <string name="lyrics_translation_loading">Preparing the offline translation model…</string>
     <string name="lyrics_translation_failed">Offline translation could not be prepared. Check your connection for the first model download, then tap here to retry.</string>
     <string name="lyrics_translation_attribution">Powered by Google Translate</string>
@@ -572,4 +572,10 @@
     <string name="pref_lyrics_translation_language_summary">Default target language used when translation is enabled for an individual song</string>
 
     <string name="version_summary">Installed version of RSOUNDS</string>
+
+    <string name="pref_lyrics_over_artwork_dim">Dim album artwork (%)</string>
+    <string name="pref_lyrics_over_artwork_dim_summary">Choose how much the album artwork is dimmed behind over-cover lyrics</string>
+    <string name="pref_lyrics_translation_font_family">Translation font</string>
+    <string name="pref_lyrics_translation_text_size">Translation text size (sp)</string>
+    <string name="pref_lyrics_translation_color">Translation text color</string>
 </resources>

@@ -7,7 +7,7 @@ body:
     attributes:
       label: Initial questions
       options:
-        - label: I have read the [FAQ](https://github.com/riynk/retro_music/blob/RS_DEV/FAQ.md).
+        - label: I have read the [FAQ](https://github.com/riynk/retro_music/blob/RSOUND/FAQ.md).
           required: true
         - label: I have searched for similar bugs and have not found any.
           required: true

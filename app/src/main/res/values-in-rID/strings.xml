@@ -520,4 +520,10 @@
     <string name="pref_save_last_directory_title">Save Last Directory</string>
     <string name="instagram_summary">Buka profil Instagram RSOUNDS.</string>
     <string name="version_summary">Versi aplikasi yang terpasang.</string>
+
+    <string name="pref_lyrics_over_artwork_dim">Redupkan artwork (%)</string>
+    <string name="pref_lyrics_over_artwork_dim_summary">Atur tingkat peredupan sampul album saat lirik ditampilkan di atasnya</string>
+    <string name="pref_lyrics_translation_font_family">Font terjemahan</string>
+    <string name="pref_lyrics_translation_text_size">Ukuran teks terjemahan (sp)</string>
+    <string name="pref_lyrics_translation_color">Warna teks terjemahan</string>
 </resources>

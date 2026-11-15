@@ -49,11 +49,8 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     private var artworkBoundsObserver: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var dimmedArtworkView: ImageView? = null
     private var originalArtworkColorFilter: ColorFilter? = null
-    private val artworkDimColorFilter by lazy {
-        ColorMatrixColorFilter(
-            ColorMatrix().apply { setScale(0.55f, 0.55f, 0.55f, 1f) }
-        )
-    }
+    private var appliedArtworkColorFilter: ColorFilter? = null
+    private var appliedArtworkDimPercent = -1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,7 +78,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
                     .apply()
                 legacyValue
             }
-            setCompactLineCount(lineCount.coerceIn(1, 5))
+            setCompactLineCount(lineCount.coerceIn(1, 4))
             setCompactMode(true)
             setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER))
             setOnLineClickListener { time ->
@@ -134,9 +131,10 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
                         } catch (_: ClassCastException) {
                             sharedPreferences.getInt("lyrics_over_line_count", 3)
                         }
-                        lyricsView.setCompactLineCount(lineCount.coerceIn(1, 5))
+                        lyricsView.setCompactLineCount(lineCount.coerceIn(1, 4))
                     }
                     updateLyrics()
+                    updateLyricsBounds()
                 }
             }
         }
@@ -179,7 +177,12 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     }
 
     private fun updateArtworkDimming(artwork: ImageView?) {
-        val target = artwork?.takeIf { shouldShowOverCoverLyrics() && it.isShown }
+        val dimPercent = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getInt("lyrics_over_artwork_dim", 45)
+            .coerceIn(0, 80)
+        val target = artwork?.takeIf {
+            shouldShowOverCoverLyrics() && it.isShown && dimPercent > 0
+        }
         if (target == null) {
             restoreArtworkDimming()
             return
@@ -190,18 +193,30 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             dimmedArtworkView = target
             originalArtworkColorFilter = target.colorFilter
         }
-        // Color-filter the ImageView drawable only. No scrim, panel, or dimming
-        // is added to the lyrics container or the rest of the player.
-        target.colorFilter = artworkDimColorFilter
+
+        if (appliedArtworkDimPercent != dimPercent) {
+            val brightness = 1f - (dimPercent / 100f)
+            val filter = ColorMatrixColorFilter(
+                ColorMatrix().apply {
+                    setScale(brightness, brightness, brightness, 1f)
+                }
+            )
+            // Apply the filter to the artwork only, never to the lyric surface.
+            target.colorFilter = filter
+            appliedArtworkColorFilter = filter
+            appliedArtworkDimPercent = dimPercent
+        }
     }
 
     private fun restoreArtworkDimming() {
         val artwork = dimmedArtworkView ?: return
-        if (artwork.colorFilter === artworkDimColorFilter) {
+        if (artwork.colorFilter === appliedArtworkColorFilter) {
             artwork.colorFilter = originalArtworkColorFilter
         }
         dimmedArtworkView = null
         originalArtworkColorFilter = null
+        appliedArtworkColorFilter = null
+        appliedArtworkDimPercent = -1
     }
 
     private fun attachArtworkBoundsTracking() {

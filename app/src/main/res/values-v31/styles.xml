@@ -20,6 +20,8 @@
 
     <style name="Theme.RetroMusic.SplashScreen" parent="Theme.SplashScreen">
         <item name="android:windowSplashScreenBackground">@color/blackColorSurface</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_rsounds</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/avd_rsounds_splash</item>
+        <item name="android:windowSplashScreenAnimationDuration">900</item>
+        <item name="postSplashScreenTheme">@style/Theme.RetroMusic.FollowSystem</item>
     </style>
 </resources>

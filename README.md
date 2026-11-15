@@ -1,150 +1,79 @@
-<p align="center">
-  <a href="https://retromusic.app">
-    <img src="app\src\main\ic_launcher-web.png" height="128">
-    <h1 align="center">RSOUNDS 🎵</h1>
-  </a>
-</p>
-<p align="center">Maintained by <strong>riynkkazis</strong></p>
-<p align="center">
-  <a href="https://github.com/RetroMusicPlayer/RetroMusicPlayer" style="text-decoration:none" area-label="Android">
-    <img src="https://img.shields.io/badge/Platform-Android-green.svg">
-  </a>
-  <a href="https://github.com/RetroMusicPlayer/RetroMusicPlayer/actions/workflows/android.yml" style="text-decoration:none" area-label="Build Status">
-    <img src="https://github.com/RetroMusicPlayer/RetroMusicPlayer/actions/workflows/android.yml/badge.svg">
-  </a>
-  <a href="https://github.com/RetroMusicPlayer/RetroMusicPlayer" style="text-decoration:none" area-label="Min API: 21">
-    <img src="https://img.shields.io/badge/minSdkVersion-21-green.svg">
-  </a>
-  <a href="https://play.google.com/store/apps/details?id=code.name.monkey.retromusic" style="text-decoration:none" area-label="Play Store">
-    <img src="https://img.shields.io/badge/Download-Google_Play-green.svg">
-  </a>
-  <a href="https://github.com/RetroMusicPlayer/RetroMusicPlayer/blob/master/LICENSE.md" style="text-decoration:none" area-label="License: GPL v3">
-    <img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg">
-  </a>
-  <a href="https://twitter.com/retromusicapp" style="text-decoration:none" area-label="Twitter Follow">
-    <img src="https://img.shields.io/twitter/follow/retromusicapp?style=social">
-  </a>
-  <a href="https://crowdin.com/project/retromusicplayer" style="text-decoration:none" area-label="Crowdin">
-    <img src="https://badges.crowdin.net/retromusicplayer/localized.svg">
-  </a>
+# RSOUNDS
 
-</p>
+**RSOUNDS** is an Android music player for local audio files, maintained by **riynkkazis**.
 
-___
-# We're looking for more contributors and maintainers!
-# If you'd like to be a maintainer, please DM us on [Telegram](https://telegram.me/Daksh777) or [Twitter](https://twitter.com/0xDPJ)
-# All contributions are welcome!
-___
+The app is based on the open-source Retro Music Player codebase. RSOUNDS keeps the upstream project's applicable license notices and attributions while maintaining its own app identity, settings and release documentation.
 
-## 🆕 Material You Design Music Player for Android music lovers 
+- **Application ID:** `app.riynk.rsounds`
+- **Minimum Android version:** Android 7.0 (API 24)
+- **Current version:** 1.0.1
+- **Development branch:** `RSOUND`
 
-## Download
-| Play Store | F-Droid | Obtanium |
-|:-:|:-:|:-:|
-| [<img src="assets/google-play-badge.png" height="80">](https://play.google.com/store/apps/details?id=code.name.monkey.retromusic) | [<img src="https://f-droid.org/badge/get-it-on.png" height="80">](https://f-droid.org/en/packages/code.name.monkey.retromusic/) | <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/{%22id%22:%22code.name.monkey.retromusic%22,%22url%22:%22https://github.com/RetroMusicPlayer/RetroMusicPlayer%22,%22author%22:%22RetroMusicPlayer%22,%22name%22:%22Retro Music Player%22}"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/b1c8ac6f2ab08497189721a788a5763e28ff64cd/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a>
- |
+## Build status
 
-or get it from the [GitHub Releases](https://github.com/RetroMusicPlayer/RetroMusicPlayer/releases).
+[![Android Artifact Build](https://github.com/riynk/retro_music/actions/workflows/android-artifact.yml/badge.svg?branch=RSOUND)](https://github.com/riynk/retro_music/actions/workflows/android-artifact.yml?query=branch%3ARSOUND)
 
-## ⚠ Join [@retromusiclog](https://telegram.me/retromusiclog) on Telegram for important updates.
-___
+Builds and downloadable artifacts are available from the [RSOUNDS GitHub Actions runs](https://github.com/riynk/retro_music/actions/workflows/android-artifact.yml?query=branch%3ARSOUND).
 
-## 📱 Screenshots
-### App Themes
-| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="200"/> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" width="200"/> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" width="200"/> |
+## Features
+
+- Browse and play music stored on the device.
+- Organize songs with playlists, albums, artists and folders.
+- Multiple Now Playing layouts and album artwork effects.
+- Synchronized lyrics with Replace Cover and Over Cover modes.
+- Per-song lyric translation, with independent translation font, size and colour settings.
+- Adjustable artwork dimming and 1–4 visible lyric lines in Over Cover mode.
+- Themes, widgets, sleep timer, queue management and tag editing.
+- Android Auto and Bluetooth/headset playback support.
+
+RSOUNDS is a local music player. It does not provide music downloads or online streaming.
+
+## Screenshots
+
+### Synchronized lyrics — Over Cover
+
+| Light | Dark | Black |
 |:---:|:---:|:---:|
-|Clearly white| Kinda dark | Just black|
+| ![Over Cover light](screenshots/synced_over_light.jpg) | ![Over Cover dark](screenshots/synced_over_dark.jpg) | ![Over Cover black](screenshots/synced_over_black.jpg) |
 
-### Player screen
-| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="200"/>| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg" width="200"/>| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpg" width="200"/>| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.jpg" width="200"/>| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/8.jpg" width="200"/>|
-|:---:|:---:|:---:|:---:|:---:|
-| Home | Songs | Albums | Artists | Settings |
+### Synchronized lyrics — Replace Cover
 
-### Synced lyrics screen (Over Cover)
-| <img src="screenshots/synced_over_light.jpg" width="200"/>| <img src="screenshots/synced_over_dark.jpg" width="200"/>| <img src="screenshots/synced_over_black.jpg" width="200"/>|
+| Light | Dark | Black |
 |:---:|:---:|:---:|
-| Synced Over Cover light | Synced Over Cover dark | Synced Over Cover black |
+| ![Replace Cover light](screenshots/synced_replace_light.jpg) | ![Replace Cover dark](screenshots/synced_replace_dark.jpg) | ![Replace Cover black](screenshots/synced_replace_black.jpg) |
 
-### Synced lyrics screen (Replace Cover)
-| <img src="screenshots/synced_replace_light.jpg" width="200"/>| <img src="screenshots/synced_replace_dark.jpg" width="200"/>| <img src="screenshots/synced_replace_black.jpg" width="200"/>|
-|:---:|:---:|:---:|
-| Synced Replace Cover light | Synced Replace Cover dark | Synced Replace Cover black |
+## Build from source
 
-### 10+ Now playing themes
-| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg" width="200"/>	|<img src="screenshots/fit.jpg" width="200"/>|   <img src="screenshots/flat.jpg" width="200"/>  	|    <img src="screenshots/color.jpg" width="200"/> 	|     <img src="screenshots/material.jpg" width="200"/>	|
-|:-----:	|:-----:	|:-----:	|:-----:	|:-----:	|
-| Normal 	| Fit 	| Flat 	| Color 	| Material 	|
+Use Java 21 and the Gradle wrapper included in this repository.
 
-| <img src="screenshots/classic.jpg" width="200"/>	|<img src="screenshots/adaptive.jpg" width="200"/>|   <img src="screenshots/blur.jpg" width="200"/>  	|    <img src="screenshots/tiny.jpg" width="200"/> 	|     <img src="screenshots/peek.jpg" width="200"/>	|
-|:-----:	|:-----:	|:-----:	|:-----:	|:-----:	|
-| Classic 	| Adaptive 	| Blur 	| Tiny 	| Peek 	|
+```bash
+./gradlew :app:assembleNormalDebug
+```
 
-___
+For the F-Droid flavour:
 
-## 🧭 Navigation never been made easier 
-Self-explanatory interface without overloaded menus.
+```bash
+./gradlew :app:assembleFdroidDebug
+```
 
-## 🎨 Colorful
-You can choose between three different main themes: Clearly White, Kinda
-Dark and Just Black for AMOLED displays. Select your favorite accent
-color from a color palette.
+The debug build uses a separate application ID suffix, but its launcher label is **RSOUNDS**.
 
-## 🏠 Home
-Where you can view your recently/top played artists, albums and
-favorite songs. No other music player has this feature.
+## Bug reports and feature requests
 
-## 📦 Included Features
--  Base 3 themes (Clearly White, Kinda Dark and Just Black)
--  Chromecast support
--  Choose from 10+ now playing themes
--  Driving Mode
--  Headset/Bluetooth support
--  Music duration filter
--  Android Auto support
--  Wallpaper accent picker on Android 8.1+
--  Material You support on Android 12+
--  Monet themed icon support on Android 13+
--  Folder support - Play songs by folder
--  Gapless playback
--  Volume controls
--  Carousel effect for album covers
--  Home screen widgets
--  Lock screen playback controls
--  Lyrics screen (download and sync with music)
--  Sleep timer
--  Easy drag to sort playlist & play queue
--  Tag editor
--  Create, edit and import playlists
--  Playing queue with reorder
--  User profile
--  30+ languages support (help translate the project: [Crowdin](https://crowdin.com/project/retromusicplayer)
--  Browse and play your music by songs, albums, artists, playlists and
-  genre
--  Smart Auto Playlists - Recently played, most played and history
--  Build your playlist on the go
+Before opening an issue, check the [FAQ](FAQ.md) and search existing reports.
 
-We are trying our best to bring you the best user experience. The app is regularly updated for bug fixes and new features.
+- [Report a bug](https://github.com/riynk/retro_music/issues/new?template=bug-report.yml)
+- [Request a feature](https://github.com/riynk/retro_music/issues/new?template=feature-request.yml)
 
-___
+## Contact
 
+- Telegram: [@riyankazis](https://t.me/riyankazis)
+- Instagram: [@riynkk_](https://www.instagram.com/riynkk_/)
+- Twitter: [@RiynkkAzis](https://twitter.com/RiynkkAzis)
+- GitHub: [riynk](https://github.com/riynk)
 
-## ❓ FAQ
-Please read the FAQ [here](https://retromusic.app/faq.html)
+## License
 
-In any case, if you find or notice any bugs please report them by creating an issue or by contacting us in the [Telegram help & feedback group](https://t.me/retromusicapp).
-If you have any feature suggestions, please create an issue with detailed information or by contacting us in the [Telegram suggestions group](https://t.me/retro_music_suggestion).
+RSOUNDS is distributed under the GNU General Public License v3.0. See [LICENSE.md](LICENSE.md) and the copyright or license notices in individual source files and dependencies.
 
-## 🔗 Social links
-**Telegram:** https://t.me/retromusicapp <br>
-**Crowdin**: https://crowdin.com/project/retromusicplayer <br>
-**Pinterest:** https://pinterest.com/retromusicapp <br>
-**Twitter:** https://twitter.com/retromusicapp <br>
-
-## 🗂️ License
-
-Retro Music Player is released under the GNU General Public License v3.0
-(GPLv3), which can be found [here](LICENSE.md)
-
-
->Please note: Retro Music Player is a local music player app. It
->doesn't support music downloading or online music streaming.
+The original Retro Music Player project is credited as the upstream codebase; this repository does not claim ownership of upstream contributions.

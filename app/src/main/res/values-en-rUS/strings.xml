@@ -554,4 +554,10 @@
 
     <string name="help_summary">Read answers to common RSOUNDS questions.</string>
     <string name="version_summary">Installed version of RSOUNDS</string>
+
+    <string name="pref_lyrics_over_artwork_dim">Dim album artwork (%)</string>
+    <string name="pref_lyrics_over_artwork_dim_summary">Choose how much the album artwork is dimmed behind over-cover lyrics</string>
+    <string name="pref_lyrics_translation_font_family">Translation font</string>
+    <string name="pref_lyrics_translation_text_size">Translation text size (sp)</string>
+    <string name="pref_lyrics_translation_color">Translation text color</string>
 </resources>
