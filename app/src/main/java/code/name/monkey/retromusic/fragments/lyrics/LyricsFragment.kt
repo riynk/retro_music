@@ -578,20 +578,6 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
             }
 
             binding.karaokeLyricsView.setTranslationStatus(null)
-            if (LyricsPreferences.source(context, currentSong) == LyricsSource.TTML) {
-                setLyricsSourceSubtitle("ttml")
-                binding.karaokeLyricsView.setEmptyMessage(
-                    getString(R.string.lyrics_source_ttml_missing)
-                )
-                binding.karaokeLyricsView.isVisible = true
-                binding.lyricsView.isVisible = false
-                binding.normalLyrics.isVisible = false
-                binding.noLyricsFound.isVisible = false
-                binding.editButton.isVisible = false
-                lyricsType = LyricsType.ADVANCED_LYRICS
-                return@launch
-            }
-
             binding.karaokeLyricsView.isVisible = false
             binding.editButton.isVisible = true
             val hasSyncedLrc = loadLRCLyrics()

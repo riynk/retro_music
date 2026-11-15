@@ -212,7 +212,7 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
                 return true
             }
 
-            R.id.action_show_lyrics -> {
+            R.id.action_go_to_lyrics -> {
                 goToLyrics(requireActivity())
                 return true
             }

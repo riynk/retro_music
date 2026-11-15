@@ -4,7 +4,7 @@
  */
 package code.name.monkey.retromusic.lyrics.translation
 
-import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.tasks.Task
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.TranslateLanguage
@@ -13,26 +13,40 @@ import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * Offline lyric translation using ML Kit's dynamically downloaded language
  * models. The model is fetched once for a language pair and then used locally.
  *
- * To reduce latency, lyric lines are translated together in multi-line batches.
- * If ML Kit changes line breaks in its output, the affected batch falls back to
- * independent line requests so LRC/TTML line alignment is never guessed.
+ * Model downloads and translation requests are bounded: a stalled Google Play
+ * Services task must never leave the lyric surface in its loading state forever.
+ * Lyrics remain visible while translation is prepared.
  */
 object OnDeviceLyricsTranslator {
     private const val MAX_BATCH_CHARACTERS = 1_800
     private const val MAX_BATCH_LINES = 24
     private const val FALLBACK_PARALLELISM = 4
+    private const val LANGUAGE_ID_TIMEOUT_MS = 20_000L
+    private const val MODEL_DOWNLOAD_TIMEOUT_MS = 120_000L
+    private const val TRANSLATION_TIMEOUT_MS = 45_000L
+
+    // The full-page and over-cover lyric surfaces can request the same model
+    // around the same time. Avoid starting duplicate model downloads.
+    private val modelDownloadMutex = Mutex()
 
     suspend fun translate(
         lines: List<String>,
@@ -48,16 +62,22 @@ object OnDeviceLyricsTranslator {
         if (sourceSample.isBlank()) return@withContext lines
 
         val sourceTag = identifySourceLanguage(sourceSample)
-        val sourceLanguage = TranslateLanguage.fromLanguageTag(sourceTag)
+        val sourceCode = sourceTag.trim().replace('_', '-').substringBefore('-')
+        val sourceLanguage = TranslateLanguage.fromLanguageTag(sourceCode)
             ?: throw IOException("The detected lyric language is not supported")
 
-        val targetLanguage = TranslateLanguage.fromLanguageTag(
-            targetLanguageTag.trim().replace('_', '-').substringBefore('-')
-        ) ?: throw IOException("The selected translation language is not supported")
+        val targetCode = targetLanguageTag.trim()
+            .replace('_', '-')
+            .substringBefore('-')
+            .lowercase()
+        val targetLanguage = TranslateLanguage.fromLanguageTag(targetCode)
+            ?: throw IOException("The selected translation language is not supported")
 
         if (sourceLanguage == targetLanguage) return@withContext lines
 
         val uniqueLines = lines.filter { it.isNotBlank() }.distinct()
+        if (uniqueLines.isEmpty()) return@withContext lines
+
         val translator = Translation.getClient(
             TranslatorOptions.Builder()
                 .setSourceLanguage(sourceLanguage)
@@ -66,34 +86,27 @@ object OnDeviceLyricsTranslator {
         )
 
         try {
-            // First use downloads the language model. Later translations run offline.
-            Tasks.await(
-                translator.downloadModelIfNeeded(DownloadConditions.Builder().build())
-            )
+            modelDownloadMutex.withLock {
+                awaitTask(
+                    translator.downloadModelIfNeeded(DownloadConditions.Builder().build()),
+                    MODEL_DOWNLOAD_TIMEOUT_MS,
+                    "Preparing the offline translation model"
+                )
+            }
 
             val translatedByLine = LinkedHashMap<String, String>()
             for (batch in createBatches(uniqueLines)) {
                 currentCoroutineContext().ensureActive()
 
-                val batchResult = try {
-                    translateBatch(translator, batch)
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (_: Exception) {
-                    null
-                }
-
+                // A failed ML Kit request is reported immediately. Only a
+                // malformed batch mapping falls back to per-line translation.
+                val batchResult = translateBatch(translator, batch)
                 if (batchResult != null) {
                     batch.forEachIndexed { index, source ->
                         translatedByLine[source] = batchResult[index]
                     }
                 } else {
-                    // Newlines are not preserved by every translation output.
-                    // Fall back rather than assigning a translated line to the
-                    // wrong timestamp in LRC/TTML.
-                    translatedByLine.putAll(
-                        translateIndividually(translator, batch)
-                    )
+                    translatedByLine.putAll(translateIndividually(translator, batch))
                 }
             }
 
@@ -110,14 +123,44 @@ object OnDeviceLyricsTranslator {
         }
     }
 
-    private fun identifySourceLanguage(text: String): String {
+    private suspend fun identifySourceLanguage(text: String): String {
         val identifier = LanguageIdentification.getClient()
         return try {
-            Tasks.await(identifier.identifyLanguage(text))
-                .takeIf { it.isNotBlank() && it != "und" }
+            awaitTask(
+                identifier.identifyLanguage(text),
+                LANGUAGE_ID_TIMEOUT_MS,
+                "Identifying the lyric language"
+            ).takeIf { it.isNotBlank() && it != "und" }
                 ?: throw IOException("Could not identify the lyric language")
         } finally {
             identifier.close()
+        }
+    }
+
+    private suspend fun <T> awaitTask(
+        task: Task<T>,
+        timeoutMillis: Long,
+        operation: String
+    ): T {
+        return try {
+            withTimeout(timeoutMillis) {
+                suspendCancellableCoroutine { continuation ->
+                    task.addOnCompleteListener { completed ->
+                        if (!continuation.isActive) return@addOnCompleteListener
+                        if (completed.isSuccessful) {
+                            continuation.resume(completed.result)
+                        } else {
+                            continuation.resumeWithException(
+                                completed.exception ?: IOException("$operation failed")
+                            )
+                        }
+                    }
+                }
+            }
+        } catch (timeout: TimeoutCancellationException) {
+            // Convert only this helper's timeout to a normal failure. The caller
+            // can then show its retry message instead of leaving "Preparing…" up.
+            throw IOException("$operation timed out", timeout)
         }
     }
 
@@ -147,7 +190,7 @@ object OnDeviceLyricsTranslator {
         return batches
     }
 
-    private fun translateBatch(
+    private suspend fun translateBatch(
         translator: Translator,
         batch: List<String>
     ): List<String>? {
@@ -155,12 +198,15 @@ object OnDeviceLyricsTranslator {
 
         // ML Kit may remove newline characters. Use code-like markers so each
         // translated segment can be mapped back to its original lyric line.
-        // If a marker is changed or dropped, return null and use line fallback.
         val markers = batch.indices.map(::lineMarker)
         val markedText = batch.indices.joinToString(separator = " ") { index ->
             "${batch[index]} ${markers[index]}"
         }
-        val translated = Tasks.await(translator.translate(markedText)).trim()
+        val translated = awaitTask(
+            translator.translate(markedText),
+            TRANSLATION_TIMEOUT_MS,
+            "Translating a lyric batch"
+        ).trim()
 
         val translatedLines = ArrayList<String>(batch.size)
         var cursor = 0
@@ -190,7 +236,11 @@ object OnDeviceLyricsTranslator {
         batch.chunked(FALLBACK_PARALLELISM).flatMap { group ->
             group.map { source ->
                 async(Dispatchers.IO) {
-                    source to Tasks.await(translator.translate(source)).trim()
+                    source to awaitTask(
+                        translator.translate(source),
+                        TRANSLATION_TIMEOUT_MS,
+                        "Translating a lyric line"
+                    ).trim()
                 }
             }.awaitAll()
         }.toMap()

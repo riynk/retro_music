@@ -51,7 +51,9 @@ object LyricsDocumentLoader {
             }.getOrNull()
 
             when (selectedSource) {
-                LyricsSource.TTML -> loadTtml()
+                // A per-track TTML preference must not hide available LRC lyrics
+                // when that track has no usable TTML file.
+                LyricsSource.TTML -> loadTtml() ?: loadLrc()
                 LyricsSource.LRC -> loadLrc()
                 LyricsSource.AUTOMATIC -> loadTtml() ?: loadLrc()
             }
@@ -77,7 +79,12 @@ object LyricsDocumentLoader {
         val engineCacheKey = "google_mlkit_offline_v2_$lyricsHash"
         val cache = LyricsTranslationCache(appContext)
         val cached = cache.get(songKey, targetLanguage, engineCacheKey)
-            ?.takeIf { it.size == document.lines.size }
+            ?.takeIf { translations ->
+                translations.size == document.lines.size &&
+                    document.lines.indices.all { index ->
+                        document.lines[index].text.isBlank() || translations[index].isNotBlank()
+                    }
+            }
         if (cached != null) return@withContext cached
 
         val translated = OnDeviceLyricsTranslator.translate(
