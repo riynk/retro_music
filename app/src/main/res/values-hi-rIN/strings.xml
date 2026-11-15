@@ -394,7 +394,7 @@
     <string name="reset_action">रीसेट</string>
     <string name="reset_artist_image">कलाकार छवि रीसेट करें</string>
     <string name="restore">पुनर्स्थापित करें</string>
-    <string name="retro_music_player">रेट्रो म्यूजिक प्लेयर</string>
+    <string name="retro_music_player">RSOUNDS</string>
     <string name="ringtone_summary">संगीत को रिंगटोन के रूप में सेट करने के लिए ऐप को आपकी डिवाइस सेटिंग्स तक पहुंचने की अनुमति की आवश्यकता है।</string>
     <string name="ringtone_title">रिंगटोन (वैकल्पिक)</string>
     <string name="permission_alarm_summary">The app needs permission to schedule exact alarms to set sleep timers</string>
@@ -500,7 +500,7 @@
     <string name="you_have_to_select_at_least_one_category">आपको कम से कम एक कैटेगरी का चयन करना होगा।</string>
     <string name="you_will_be_forwarded_to_the_issue_tracker_website">आपको इश्यू ट्रैकर वेबसाइट पर भेज दिया जाएगा।</string>
     <string name="could_not_write_tags_to_file">म्यूजिक फ़ाइल में टैग नहीं लिखा जा सका!</string>
-    <string name="sleep_timer_no_permission">No permission to schedule alarms, please allow Retro Music.</string>
+    <string name="sleep_timer_no_permission">No permission to schedule alarms, please allow RSOUNDS.</string>
     <string name="scanning_folders_files">Scanning folders and files…</string>
     <string name="scan_complete">Scan complete: %1$d media items found.</string>
     <string name="pref_save_last_directory_summary">When switching to folder view, restore last used directory</string>

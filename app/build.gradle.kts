@@ -20,9 +20,9 @@ android {
             useSupportLibrary = true
         }
 
-        applicationId = namespace
+        applicationId = "app.riynk.rsounds"
         versionCode = 10703
-        versionName = "7.0.3"
+        versionName = "1.0.1"
 
         buildConfigField("String", "GOOGLE_PLAY_LICENSING_KEY", "\"${getProperty(getProperties("../public.properties"), "GOOGLE_PLAY_LICENSE_KEY")}\"")
     }
