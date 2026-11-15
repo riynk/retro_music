@@ -172,7 +172,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
      * or the ViewPager switches to a different artwork view.
      */
     private fun applyArtworkDimming(artwork: ImageView) {
-        if (!binding.playerLyrics.isVisible) {
+        if (!shouldShowOverCoverLyrics()) {
             restoreArtworkDimming()
             return
         }
