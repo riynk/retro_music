@@ -47,7 +47,7 @@ class OtherSettingsFragment : AbsSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         PreferenceUtil.languageCode =
             AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { "auto" }
-        addPreferencesFromResource(R.xml.pref_advanced)
+        setPreferencesFromResource(R.xml.pref_advanced, rootKey)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
