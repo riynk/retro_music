@@ -19,7 +19,8 @@ enum class LyricsSurface(
 data class LyricsDisplayStyle(
     val textSizeSp: Float = 28f,
     val fontFamily: String = "sans-serif",
-    val alignment: String = "center"
+    val alignment: String = "center",
+    val lineSpacingDp: Int = 5
 )
 
 object LyricsDisplaySettings {
@@ -34,7 +35,8 @@ object LyricsDisplaySettings {
             fontFamily = preferences.getString("${prefix}_font_family", "sans-serif")
                 ?.takeIf { it.isNotBlank() } ?: "sans-serif",
             alignment = preferences.getString("${prefix}_alignment", "center")
-                ?.takeIf { it in setOf("left", "center", "right") } ?: "center"
+                ?.takeIf { it in setOf("left", "center", "right") } ?: "center",
+            lineSpacingDp = preferences.getInt("lyrics_line_spacing", 5).coerceIn(0, 20)
         )
     }
 }
