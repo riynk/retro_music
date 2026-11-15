@@ -54,6 +54,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
     private var translationStatusView: TextView? = null
     private var style = LyricsDisplayStyle()
     private var compactMode = false
+    private var compactLineCount = 3
 
     private var primaryTextColor = resolveThemeColor(android.R.attr.textColorPrimary, Color.WHITE)
     private var secondaryTextColor =
@@ -91,6 +92,13 @@ class KaraokeLyricsView @JvmOverloads constructor(
      * Shows only the active lyric and its immediate neighbours. Used by the
      * artwork overlay so the lyric surface never turns into a full-page list.
      */
+    fun setCompactLineCount(count: Int) {
+        val normalized = count.coerceIn(1, 5)
+        if (compactLineCount == normalized) return
+        compactLineCount = normalized
+        document?.let { renderLines(it, currentLine) }
+    }
+
     fun setCompactMode(enabled: Boolean) {
         if (compactMode == enabled) return
         compactMode = enabled
@@ -238,11 +246,11 @@ class KaraokeLyricsView @JvmOverloads constructor(
         }
 
         if (compactMode) {
-            val visibleCount = minOf(3, value.lines.size)
+            val visibleCount = minOf(compactLineCount, value.lines.size)
             if (visibleCount == 0) return
             val focusIndex = activeIndex.coerceIn(0, value.lines.lastIndex)
             val maxStart = (value.lines.size - visibleCount).coerceAtLeast(0)
-            val startIndex = (focusIndex - 1).coerceIn(0, maxStart)
+            val startIndex = (focusIndex - visibleCount / 2).coerceIn(0, maxStart)
             for (index in startIndex until startIndex + visibleCount) {
                 addRenderedLine(index, activeIndex, compact = true)
             }
