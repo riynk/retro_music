@@ -252,7 +252,7 @@
     <string name="now_playing_queue">Now playing queue</string>
     <string name="now_playing_summary">Customize the now playing screen</string>
     <string name="only_on_wifi">Only on Wi-Fi</string>
-    <string name="other_settings_summary">Advanced testing features</string>
+    <string name="other_settings_summary">Manage library filters, playback and app behavior</string>
     <string name="others">Other</string>
     <string name="over_cover">Over Cover</string>
     <string name="past_three_months">Past 3 months</string>
