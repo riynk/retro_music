@@ -531,7 +531,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                 }
 
                 val highlightWords = preferences.getBoolean("lyrics_word_highlight", true)
-                // Keep the original timed lyrics visible while the online service translates them.
+                // Keep original timed lyrics visible while the on-device model prepares and translates them.
                 binding.karaokeLyricsView.setDocument(document, null, highlightWords)
                 setLyricsSourceSubtitle(
                     document.sourceFormat,
@@ -559,7 +559,9 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                             translations,
                             highlightWords
                         )
-                        binding.karaokeLyricsView.setTranslationStatus(null)
+                        binding.karaokeLyricsView.setTranslationStatus(
+                            getString(R.string.lyrics_translation_attribution)
+                        )
                     } catch (cancelled: CancellationException) {
                         throw cancelled
                     } catch (_: Exception) {

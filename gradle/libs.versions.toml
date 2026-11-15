@@ -18,6 +18,7 @@ koinAndroid = "3.5.6"
 kotlinGradlePlugin = "2.1.21"
 
 kotlinxCoroutinesAndroid = "1.10.2"
+mlkitTranslate = "17.0.3"
 mlkitLanguageId = "17.0.6"
 google_play_billing_version = "7.0.0"
 fast_scroll_libraryVersion = "1.2.0"
@@ -90,7 +91,8 @@ retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", ve
 okhttp3-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp3_loggingInterceptor_version" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
 
-# Lightweight source-language identification for the online lyrics translator
+# On-device lyric translation and source-language identification
+mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkitTranslate" }
 mlkit-language-id = { module = "com.google.mlkit:language-id", version.ref = "mlkitLanguageId" }
 
 #misc

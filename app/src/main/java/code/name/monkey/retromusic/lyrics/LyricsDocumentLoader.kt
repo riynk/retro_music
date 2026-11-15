@@ -10,7 +10,7 @@ import code.name.monkey.retromusic.lyrics.model.LyricDocument
 import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
 import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
 import code.name.monkey.retromusic.lyrics.translation.LyricsTranslationCache
-import code.name.monkey.retromusic.lyrics.translation.OnlineLyricsTranslator
+import code.name.monkey.retromusic.lyrics.translation.OnDeviceLyricsTranslator
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.LyricUtil
 import kotlinx.coroutines.CancellationException
@@ -27,7 +27,7 @@ data class LoadedLyrics(
 
 /**
  * Loads local lyric files independently from translation so karaoke can start
- * immediately. Translation is sent to the online provider after local parsing.
+ * immediately. On-device translation runs separately after local parsing.
  */
 object LyricsDocumentLoader {
     suspend fun loadDocument(context: Context, song: Song): LyricDocument? =
@@ -73,14 +73,14 @@ object LyricsDocumentLoader {
                     .toByteArray(Charsets.UTF_8)
             )
             .joinToString("") { byte -> "%02x".format(byte.toInt() and 0xff) }
-        // Keep old on-device translations from being mistaken for online results.
-        val engineCacheKey = "mymemory_online_v1_$lyricsHash"
+        // Version the engine key so results from older online engines are never reused.
+        val engineCacheKey = "google_mlkit_offline_v2_$lyricsHash"
         val cache = LyricsTranslationCache(appContext)
         val cached = cache.get(songKey, targetLanguage, engineCacheKey)
             ?.takeIf { it.size == document.lines.size }
         if (cached != null) return@withContext cached
 
-        val translated = OnlineLyricsTranslator.translate(
+        val translated = OnDeviceLyricsTranslator.translate(
             document.lines.map { it.text },
             targetLanguage
         )

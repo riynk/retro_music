@@ -539,7 +539,7 @@
     <string name="pref_lyrics_word_highlight">Word-by-word highlighting</string>
     <string name="pref_lyrics_word_highlight_summary">Highlight timed words when the lyric file contains word-level timestamps</string>
     <string name="pref_lyrics_translation">Show translation</string>
-    <string name="pref_lyrics_translation_summary">Translate only the current song when enabled from the Now Playing or Lyrics menu. The translation model is downloaded once and then runs on this device</string>
+    <string name="pref_lyrics_translation_summary">Translate only the current song when enabled from the Now Playing or Lyrics menu. The model is downloaded separately (about 30 MB per language) and then works offline. Powered by Google Translate. This service may contain translations powered by Google. Google disclaims all warranties related to the translations, express or implied, including any warranties of accuracy, reliability, and any implied warranties of merchantability, fitness for a particular purpose, and noninfringement.</string>
     <string name="pref_lyrics_translation_language">Translation language</string>
 
     <string name="pref_header_lyrics_appearance">Lyrics appearance</string>
@@ -549,9 +549,10 @@
     <string name="pref_lyrics_text_size">Text size (sp)</string>
     <string name="pref_lyrics_font_family">Font family</string>
     <string name="pref_lyrics_alignment">Text alignment</string>
-    <string name="lyrics_translation_loading">Translating online…</string>
-    <string name="lyrics_translation_failed">Online translation failed. Check your internet connection, then tap here to retry.</string>
-    <string name="action_toggle_lyrics_translation">Translate this song</string>
+    <string name="lyrics_translation_loading">Preparing the offline translation model…</string>
+    <string name="lyrics_translation_failed">Offline translation could not be prepared. Check your connection for the first model download, then tap here to retry.</string>
+    <string name="lyrics_translation_attribution">Powered by Google Translate</string>
+    <string name="action_toggle_lyrics_translation">Translate with Google</string>
     <string name="action_choose_lyrics_source">Choose lyric source</string>
     <string name="lyrics_source_auto">Automatic (prefer TTML)</string>
     <string name="lyrics_source_lrc">LRC</string>

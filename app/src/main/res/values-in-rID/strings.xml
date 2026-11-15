@@ -355,7 +355,7 @@
     <string name="pref_title_lyrics_screen_on">Tetap aktifkan layar saat menampilkan lirik</string>
     <string name="pref_title_lyrics_type">Mode tampilan lirik</string>
     <string name="pref_summary_lyrics_type">Ganti Sampul menyembunyikan artwork dan memakai area sampul untuk lirik. Di Atas Sampul mempertahankan artwork dengan lirik di atasnya.</string>
-    <string name="action_toggle_lyrics_translation">Terjemahkan lagu ini</string>
+    <string name="action_toggle_lyrics_translation">Terjemahkan dengan Google</string>
     <string name="action_choose_lyrics_source">Pilih sumber lirik</string>
     <string name="lyrics_source_auto">Otomatis (utamakan TTML)</string>
     <string name="lyrics_source_lrc">LRC</string>
@@ -365,8 +365,10 @@
     <string name="lyrics_status_lrc_lines">LRC · tersinkron per baris</string>
     <string name="lyrics_source_ttml_missing">File lirik TTML tidak ditemukan. Pilih Otomatis atau LRC untuk memakai sumber lain yang tersedia.</string>
     <string name="pref_lyrics_translation_language_summary">Bahasa tujuan yang digunakan saat terjemahan diaktifkan untuk lagu tertentu.</string>
-    <string name="lyrics_translation_loading">Menerjemahkan lirik secara online…</string>
-    <string name="lyrics_translation_failed">Terjemahan online gagal. Periksa koneksi internet, lalu ketuk untuk mencoba lagi.</string>
+    <string name="pref_lyrics_translation_summary">Terjemahkan lagu yang sedang diputar. Model diunduh terpisah (sekitar 30 MB per bahasa), lalu dapat digunakan secara offline. Didukung Google Translate. Layanan ini dapat memuat terjemahan yang didukung Google. Google tidak memberikan jaminan atas terjemahan, baik tersurat maupun tersirat, termasuk keakuratan, keandalan, kelayakan jual, kesesuaian untuk tujuan tertentu, dan tidak adanya pelanggaran hak.</string>
+    <string name="lyrics_translation_loading">Menyiapkan model terjemahan offline…</string>
+    <string name="lyrics_translation_failed">Terjemahan offline gagal disiapkan. Periksa koneksi untuk unduhan model pertama, lalu ketuk untuk mencoba lagi.</string>
+    <string name="lyrics_translation_attribution">Didukung Google Translate</string>
     <string name="pref_title_manage_audio_focus">Selalu putar</string>
     <string name="pref_title_now_playing_screen_appearance">Tema Pemutaran</string>
     <string name="pref_title_open_source_licences">Lisensi sumber terbuka</string>
