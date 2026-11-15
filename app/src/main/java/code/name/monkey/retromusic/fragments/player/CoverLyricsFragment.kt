@@ -8,6 +8,7 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
