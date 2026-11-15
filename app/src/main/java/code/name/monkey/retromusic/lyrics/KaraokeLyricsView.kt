@@ -61,6 +61,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
     private var accentTextColor = resolveThemeColor(android.R.attr.colorAccent, 0xFF80CBC4.toInt())
 
     init {
+        // Keep the scroll surface and its internal text column fully transparent.
+        setBackgroundColor(Color.TRANSPARENT)
+        content.setBackgroundColor(Color.TRANSPARENT)
         isFillViewport = true
         isVerticalScrollBarEnabled = false
         overScrollMode = OVER_SCROLL_NEVER
