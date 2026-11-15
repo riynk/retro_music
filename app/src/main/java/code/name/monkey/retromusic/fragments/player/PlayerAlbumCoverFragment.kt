@@ -351,6 +351,8 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
 
     override fun onPageSelected(position: Int) {
         currentPosition = position
+        (childFragmentManager.findFragmentById(R.id.cover_lyrics) as? CoverLyricsFragment)
+            ?.refreshArtworkEffects()
         if (binding.viewPager.adapter != null) {
             (binding.viewPager.adapter as AlbumCoverPagerAdapter).receiveColor(
                 colorReceiver,
