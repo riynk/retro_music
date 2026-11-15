@@ -1,9 +1,10 @@
 <p align="center">
   <a href="https://retromusic.app">
     <img src="app\src\main\ic_launcher-web.png" height="128">
-    <h1 align="center">Retro Music Player 🎵</h1>
+    <h1 align="center">RSOUNDS 🎵</h1>
   </a>
 </p>
+<p align="center">Maintained by <strong>riynkkazis</strong></p>
 <p align="center">
   <a href="https://github.com/RetroMusicPlayer/RetroMusicPlayer" style="text-decoration:none" area-label="Android">
     <img src="https://img.shields.io/badge/Platform-Android-green.svg">

@@ -1,4 +1,4 @@
-Retro Music Player 🎵
+RSOUNDS 🎵
 
 <b>📦 Included Features</b>
 <ul>

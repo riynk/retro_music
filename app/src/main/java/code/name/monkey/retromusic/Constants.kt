@@ -19,7 +19,7 @@ import android.provider.MediaStore
 
 object Constants {
     const val RATE_ON_GOOGLE_PLAY =
-        "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic"
+        "https://play.google.com/store/apps/details?id=app.riynk.rsounds"
     const val TRANSLATE = "https://crowdin.com/project/retromusicplayer"
     const val WEBSITE = "https://retromusic.app"
     const val GITHUB_PROJECT = "https://github.com/RetroMusicPlayer/RetroMusicPlayer"
