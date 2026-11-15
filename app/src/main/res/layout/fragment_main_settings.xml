@@ -52,15 +52,6 @@
 
 
         <code.name.monkey.retromusic.views.SettingListItemView
-            android:id="@+id/imageSettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:settingListItemIcon="@drawable/ic_image"
-            app:settingListItemIconColor="@color/md_deep_orange_A400"
-            app:settingListItemText="@string/image_settings_summary"
-            app:settingListItemTitle="@string/pref_header_images" />
-
-        <code.name.monkey.retromusic.views.SettingListItemView
             android:id="@+id/otherSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
