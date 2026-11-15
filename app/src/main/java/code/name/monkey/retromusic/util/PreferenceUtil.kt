@@ -143,8 +143,8 @@ object PreferenceUtil {
         CategoryInfo(CategoryInfo.Category.Songs, true),
         CategoryInfo(CategoryInfo.Category.Albums, true),
         CategoryInfo(CategoryInfo.Category.Artists, true),
-        CategoryInfo(CategoryInfo.Category.Playlists, true),
-        CategoryInfo(CategoryInfo.Category.Genres, false),
+        CategoryInfo(CategoryInfo.Category.Genres, true),
+        CategoryInfo(CategoryInfo.Category.Playlists, false),
         CategoryInfo(CategoryInfo.Category.Folder, false),
         CategoryInfo(CategoryInfo.Category.Search, false)
     )
@@ -477,7 +477,7 @@ object PreferenceUtil {
 
     var albumGridStyle: GridStyle
         get() {
-            val id: Int = sharedPreferences.getInt(ALBUM_GRID_STYLE, 0)
+            val id: Int = sharedPreferences.getInt(ALBUM_GRID_STYLE, 5)
             return GridStyle.values().firstOrNull { gridStyle ->
                 gridStyle.id == id
             } ?: GridStyle.Grid
@@ -488,7 +488,7 @@ object PreferenceUtil {
 
     var artistGridStyle: GridStyle
         get() {
-            val id: Int = sharedPreferences.getInt(ARTIST_GRID_STYLE, 3)
+            val id: Int = sharedPreferences.getInt(ARTIST_GRID_STYLE, 4)
             return GridStyle.values().firstOrNull { gridStyle ->
                 gridStyle.id == id
             } ?: GridStyle.Circular
@@ -541,7 +541,7 @@ object PreferenceUtil {
     val homeArtistGridStyle: Int
         get() {
             val position = sharedPreferences.getStringOrDefault(
-                HOME_ARTIST_GRID_STYLE, "0"
+                HOME_ARTIST_GRID_STYLE, "1"
             ).toInt()
             val layoutRes =
                 App.getContext().resources.obtainTypedArray(R.array.pref_home_grid_style_layout)
@@ -556,7 +556,7 @@ object PreferenceUtil {
     val homeAlbumGridStyle: Int
         get() {
             val position = sharedPreferences.getStringOrDefault(
-                HOME_ALBUM_GRID_STYLE, "4"
+                HOME_ALBUM_GRID_STYLE, "2"
             ).toInt()
             val layoutRes = App.getContext()
                 .resources.obtainTypedArray(R.array.pref_home_grid_style_layout).use {

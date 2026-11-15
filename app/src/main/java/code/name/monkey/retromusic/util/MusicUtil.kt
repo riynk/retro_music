@@ -523,4 +523,8 @@ object MusicUtil : KoinComponent {
     fun songByGenre(genreId: Long): Song {
         return repository.getSongByGenre(genreId)
     }
+
+    suspend fun songsByGenre(genreId: Long): List<Song> {
+        return repository.getGenre(genreId)
+    }
 }

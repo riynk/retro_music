@@ -24,6 +24,36 @@
             tools:ignore="UnusedAttribute,UselessParent">
 
             <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageTertiary"
+                android:layout_width="68dp"
+                android:layout_height="68dp"
+                android:layout_marginTop="24dp"
+                android:rotation="18"
+                android:scaleType="centerCrop"
+                android:translationX="4dp"
+                android:translationY="16dp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription"
+                tools:src="@tools:sample/avatars" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageSecondary"
+                android:layout_width="74dp"
+                android:layout_height="74dp"
+                android:layout_marginTop="24dp"
+                android:rotation="24"
+                android:scaleType="centerCrop"
+                android:translationX="12dp"
+                android:translationY="12dp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription"
+                tools:src="@tools:sample/avatars" />
+
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/image"
                 android:layout_width="80dp"
                 android:layout_height="80dp"

@@ -71,7 +71,16 @@ class MainActivity : AbsCastActivity(), PreferenceFragmentCompat.OnPreferenceSta
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setOnExitAnimationListener { provider ->
+            provider.view.animate()
+                .alpha(0f)
+                .scaleX(1.04f)
+                .scaleY(1.04f)
+                .setDuration(220L)
+                .withEndAction { provider.remove() }
+                .start()
+        }
         super.onCreate(savedInstanceState)
         setTaskDescriptionColorAuto()
         hideStatusBar()

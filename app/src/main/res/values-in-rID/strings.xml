@@ -219,7 +219,7 @@
     <string name="message_limit_tabs">Tidak lebih dari 5 item</string>
     <string name="message_restore_success">Restorasi sukses.</string>
     <string name="message_updated">Diperbarui</string>
-    <string name="message_welcome"><![CDATA[Halo! <br> Selamat datang ke %s]]></string>
+    <string name="message_welcome">Halo!\nSelamat datang di %s</string>
     <string name="my_name">Nama</string>
     <string name="my_top_tracks">Sering diputar</string>
     <string name="never">Tidak pernah</string>

@@ -20,6 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.ItemGenreBinding
@@ -33,6 +34,7 @@ import code.name.monkey.retromusic.util.MusicUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.bumptech.glide.Glide
 import java.util.*
+import kotlinx.coroutines.launch
 
 /**
  * @author Hemanth S (h4h13).
@@ -69,18 +71,50 @@ class GenreAdapter(
     }
 
     private fun loadGenreImage(genre: Genre, holder: GenreAdapter.ViewHolder) {
-        val genreSong = MusicUtil.songByGenre(genre.id)
-        Glide.with(activity)
-            .asBitmapPalette()
-            .songCoverOptions(genreSong)
-            .load(RetroGlideExtension.getSongModel(genreSong))
-            .into(object : RetroMusicColoredTarget(holder.binding.image) {
-                override fun onColorReady(colors: MediaNotificationProcessor) {
-                    setColors(holder, colors)
-                }
-            })
-        // Just for a bit of shadow around image
-        holder.binding.image.outlineProvider = ViewOutlineProvider.BOUNDS
+        holder.itemView.setTag(R.id.genre_artwork_tag, genre.id)
+        val artworkViews = listOf(
+            holder.binding.image,
+            holder.binding.imageSecondary,
+            holder.binding.imageTertiary
+        )
+        artworkViews.forEach {
+            it.setImageDrawable(null)
+            it.visibility = View.INVISIBLE
+        }
+
+        activity.lifecycleScope.launch {
+            val distinctArtistSongs = runCatching {
+                MusicUtil.songsByGenre(genre.id)
+                    .asSequence()
+                    .filter { it.artistId >= 0L && it.artistName.isNotBlank() }
+                    .distinctBy { it.artistId }
+                    .take(3)
+                    .toList()
+            }.getOrDefault(emptyList())
+
+            if (holder.itemView.getTag(R.id.genre_artwork_tag) != genre.id) return@launch
+            distinctArtistSongs.forEachIndexed { index, song ->
+                val target = artworkViews[index]
+                target.visibility = View.VISIBLE
+                Glide.with(activity)
+                    .load(RetroGlideExtension.getSongModel(song))
+                    .songCoverOptions(song)
+                    .into(target)
+            }
+            val paletteSong = distinctArtistSongs.firstOrNull() ?: MusicUtil.songByGenre(genre.id)
+            Glide.with(activity)
+                .asBitmapPalette()
+                .songCoverOptions(paletteSong)
+                .load(RetroGlideExtension.getSongModel(paletteSong))
+                .into(object : RetroMusicColoredTarget(holder.binding.image) {
+                    override fun onColorReady(colors: MediaNotificationProcessor) {
+                        if (holder.itemView.getTag(R.id.genre_artwork_tag) == genre.id) {
+                            setColors(holder, colors)
+                        }
+                    }
+                })
+        }
+        artworkViews.forEach { it.outlineProvider = ViewOutlineProvider.BOUNDS }
     }
 
     private fun setColors(holder: ViewHolder, color: MediaNotificationProcessor) {

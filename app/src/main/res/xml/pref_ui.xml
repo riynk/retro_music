@@ -31,7 +31,7 @@
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
         android:icon="@drawable/ic_image"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="toggle_home_banner"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_summary_home_banner"
