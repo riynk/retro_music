@@ -1,10 +1,7 @@
 package code.name.monkey.retromusic.fragments.player
 
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.graphics.Outline
-import android.graphics.PorterDuff
-import android.widget.ImageView
 import android.view.Gravity
 import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver
@@ -46,16 +43,14 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     private var lyricsLoadRequest = 0
     private var artworkBoundsRoot: View? = null
     private var artworkBoundsObserver: ViewTreeObserver.OnGlobalLayoutListener? = null
-    private var dimmedArtwork: ImageView? = null
-    private var originalArtworkColorFilter: android.graphics.ColorFilter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCoverLyricsBinding.bind(view)
-        // Over Cover is text directly on the artwork: never draw a panel behind it.
-        binding.root.setBackgroundColor(Color.TRANSPARENT)
-        binding.playerLyrics.setBackgroundColor(Color.TRANSPARENT)
-        binding.lyricsView.setBackgroundColor(Color.TRANSPARENT)
+        // Over Cover is rendered directly on the artwork. These views have no background drawable.
+        binding.root.background = null
+        binding.playerLyrics.background = null
+        binding.lyricsView.background = null
         progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
         attachArtworkBoundsTracking()
 
@@ -158,7 +153,6 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         binding.playerLyrics.isVisible = visible
         if (!visible) {
             binding.playerLyrics.alpha = 0f
-            restoreArtworkDimming()
         } else {
             // This fragment is a sibling of the artwork ViewPager's fading-edge
             // layer. Keep the Over Cover lyrics container above that layer so the
@@ -192,30 +186,6 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     }
 
     /**
-     * Darken the existing album artwork pixels, not a second backdrop layered
-     * above the cover. The original filter is restored when lyrics are hidden
-     * or the ViewPager switches to a different artwork view.
-     */
-    private fun applyArtworkDimming(artwork: ImageView) {
-        if (!shouldShowOverCoverLyrics()) {
-            restoreArtworkDimming()
-            return
-        }
-        if (dimmedArtwork !== artwork) {
-            restoreArtworkDimming()
-            dimmedArtwork = artwork
-            originalArtworkColorFilter = artwork.colorFilter
-        }
-        artwork.setColorFilter(Color.argb(0x66, 0, 0, 0), PorterDuff.Mode.SRC_ATOP)
-    }
-
-    private fun restoreArtworkDimming() {
-        dimmedArtwork?.colorFilter = originalArtworkColorFilter
-        dimmedArtwork = null
-        originalArtworkColorFilter = null
-    }
-
-    /**
      * Over Cover must use the actual player_image bounds. The host player slot
      * is often taller than the square artwork, so filling the slot lets lyrics
      * escape above and below the cover.
@@ -224,13 +194,11 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         if (_binding == null) return
         val artwork = findCurrentArtworkView() as? ImageView
         if (artwork == null || artwork.width <= 0 || artwork.height <= 0) {
-            restoreArtworkDimming()
             // Never fall back to the full player slot: Over Cover belongs only
             // inside the bounds of a real, laid-out album artwork view.
             binding.playerLyrics.isVisible = false
             return
         }
-        applyArtworkDimming(artwork)
 
         val rootLocation = IntArray(2)
         val artworkLocation = IntArray(2)
@@ -381,7 +349,6 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         }
         artworkBoundsObserver = null
         artworkBoundsRoot = null
-        restoreArtworkDimming()
         _binding = null
     }
 }
