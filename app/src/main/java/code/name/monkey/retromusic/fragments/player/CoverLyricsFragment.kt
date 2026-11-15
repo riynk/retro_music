@@ -1,6 +1,9 @@
 package code.name.monkey.retromusic.fragments.player
 
 import android.content.SharedPreferences
+import android.graphics.ColorFilter
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Outline
 import android.view.Gravity
 import android.view.ViewOutlineProvider
@@ -44,6 +47,13 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     private var lyricsLoadRequest = 0
     private var artworkBoundsRoot: View? = null
     private var artworkBoundsObserver: ViewTreeObserver.OnGlobalLayoutListener? = null
+    private var dimmedArtworkView: ImageView? = null
+    private var originalArtworkColorFilter: ColorFilter? = null
+    private val artworkDimColorFilter by lazy {
+        ColorMatrixColorFilter(
+            ColorMatrix().apply { setScale(0.55f, 0.55f, 0.55f, 1f) }
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -151,6 +161,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         binding.root.isVisible = visible
         binding.playerLyrics.isVisible = visible
         if (!visible) {
+            restoreArtworkDimming()
             binding.playerLyrics.alpha = 0f
         } else {
             // This fragment is a sibling of the artwork ViewPager's fading-edge
@@ -160,6 +171,37 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             binding.playerLyrics.alpha = 1f
             binding.root.post { updateLyricsBounds() }
         }
+    }
+
+    /** Called when ViewPager selects another artwork page. */
+    fun refreshArtworkEffects() {
+        if (_binding != null) updateLyricsBounds()
+    }
+
+    private fun updateArtworkDimming(artwork: ImageView?) {
+        val target = artwork?.takeIf { shouldShowOverCoverLyrics() && it.isShown }
+        if (target == null) {
+            restoreArtworkDimming()
+            return
+        }
+
+        if (dimmedArtworkView !== target) {
+            restoreArtworkDimming()
+            dimmedArtworkView = target
+            originalArtworkColorFilter = target.colorFilter
+        }
+        // Color-filter the ImageView drawable only. No scrim, panel, or dimming
+        // is added to the lyrics container or the rest of the player.
+        target.colorFilter = artworkDimColorFilter
+    }
+
+    private fun restoreArtworkDimming() {
+        val artwork = dimmedArtworkView ?: return
+        if (artwork.colorFilter === artworkDimColorFilter) {
+            artwork.colorFilter = originalArtworkColorFilter
+        }
+        dimmedArtworkView = null
+        originalArtworkColorFilter = null
     }
 
     private fun attachArtworkBoundsTracking() {
@@ -193,11 +235,13 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         if (_binding == null) return
         val artwork = findCurrentArtworkView() as? ImageView
         if (artwork == null || artwork.width <= 0 || artwork.height <= 0) {
+            updateArtworkDimming(null)
             // Never fall back to the full player slot: Over Cover belongs only
             // inside the bounds of a real, laid-out album artwork view.
             binding.playerLyrics.isVisible = false
             return
         }
+        updateArtworkDimming(artwork)
 
         val rootLocation = IntArray(2)
         val artworkLocation = IntArray(2)
@@ -342,6 +386,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         lyricsLoadRequest++
         lyricsLoadJob?.cancel()
         progressViewUpdateHelper?.stop()
+        restoreArtworkDimming()
         artworkBoundsObserver?.let { observer ->
             artworkBoundsRoot?.viewTreeObserver?.takeIf { it.isAlive }
                 ?.removeOnGlobalLayoutListener(observer)
