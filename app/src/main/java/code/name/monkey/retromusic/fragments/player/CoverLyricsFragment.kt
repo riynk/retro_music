@@ -66,6 +66,10 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         }
 
         lyricsView.apply {
+            setCompactLineCount(
+                PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getInt("lyrics_over_line_count", 3)
+            )
             setCompactMode(true)
             setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER))
             setOnLineClickListener { time ->
@@ -111,6 +115,11 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
                     lyricsView.setStyle(
                         LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
                     )
+                    if (key == "lyrics_over_line_count") {
+                        lyricsView.setCompactLineCount(
+                            sharedPreferences.getInt("lyrics_over_line_count", 3)
+                        )
+                    }
                     updateLyrics()
                 }
             }
