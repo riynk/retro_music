@@ -24,7 +24,7 @@ import code.name.monkey.retromusic.*
 class PersonalizeSettingsFragment : AbsSettingsFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.pref_ui)
+        setPreferencesFromResource(R.xml.pref_ui, rootKey)
         // Hide Blur album art preference on Android 11+ devices as the lockscreen album art feature was removed by Google
         // And if the feature is present in some Custom ROM's there is also an option to set blur so this preference is unnecessary on Android 11 and above
         val blurredAlbumArt: ATESwitchPreference? = findPreference(BLURRED_ALBUM_ART)
