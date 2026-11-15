@@ -93,6 +93,12 @@ object OnlineLyricsTranslator {
         if (translatedByLine.isEmpty()) {
             throw IOException("The online translation service returned no translated lines")
         }
+        if (translatedByLine.size != uniqueLines.size) {
+            // Do not cache a partly translated song: a later retry should be
+            // able to request lines that failed because of a temporary limit
+            // or network error.
+            throw IOException("Some lyric lines could not be translated online")
+        }
 
         lines.map { line ->
             if (line.isBlank()) "" else translatedByLine[line] ?: line
@@ -222,6 +228,7 @@ object OnlineLyricsTranslator {
 
                         val upper = translated.uppercase()
                         if (translated.isBlank() ||
+                            upper.contains("MYMEMORY WARNING") ||
                             upper.contains("INVALID SOURCE LANGUAGE") ||
                             upper.contains("PLEASE SELECT TWO DISTINCT LANGUAGES") ||
                             upper.contains("QUOTA EXCEEDED")
