@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="about_album_label">About %s</string>
-    <string name="about_settings_summary">Team, social links</string>
+    <string name="about_settings_summary">Developer, help and project links</string>
 
     <string name="accent_color">Accent color</string>
     <string name="accent_color_desc">The theme accent color, defaults to purple</string>
@@ -74,7 +74,7 @@
 
     <string name="always">Always</string>
 
-    <string name="app_share">Hey check out this cool music player at: https://play.google.com/store/apps/details?id=%s</string>
+    <string name="app_share">Check out RSOUNDS, an Android music player: https://github.com/riynk/retro_music</string>
     <string name="app_shortcut_shuffle_all_short">Shuffle</string>
     <string name="app_shortcut_top_tracks_short">Top Tracks</string>
     <string name="app_widget_big_name">Big</string>
@@ -102,7 +102,7 @@
     <string name="blur_card">Blur Card</string>
 
     <string name="bug_report_manual">Send manually</string>
-    <string name="bug_report_summary">An unexpected error occurred. Sorry you found this bug, if it keeps crashing \"Clear app data\" or send an Email </string>
+    <string name="bug_report_summary">Open the RSOUNDS bug report form on GitHub.</string>
 
     <string name="card">Card</string>
     <string name="card_color_style">Colored Card</string>
@@ -136,7 +136,7 @@
 
     <string name="create_action">Create</string>
 
-    <string name="credit_title">Members and contributors </string>
+    <string name="credit_title">Developer and maintainer</string>
 
     <string name="currently_listening_to_x_by_x">Currently listening to %1$s by %2$s.</string>
 
@@ -198,7 +198,7 @@
 
     <string name="genres">Genres</string>
 
-    <string name="git_hub_summary">Fork the project on GitHub</string>
+    <string name="git_hub_summary">View the RSOUNDS source code on GitHub.</string>
 
     <string name="grid_size_1">1</string>
     <string name="grid_size_2">2</string>
@@ -487,7 +487,7 @@
 
     <string name="suggestion_songs">Suggestions</string>
 
-    <string name="support_development">Support development</string>
+    <string name="support_development">RSOUNDS project</string>
 
     <string name="swipe_to_unlock">Swipe to unlock</string>
 
@@ -495,7 +495,7 @@
 
     <!-- Message displayed when tag editing fails -->
     <string name="telegram_group">Telegram</string>
-    <string name="telegram_group_summary">Join the Telegram group to discuss bugs, make suggestions, show off and more</string>
+    <string name="telegram_group_summary">Message the RSOUNDS developer on Telegram.</string>
 
     <string name="the_audio_file">The audio file</string>
 
@@ -518,7 +518,7 @@
     <string name="translate_community">Help us translate the app to your language</string>
 
     <string name="twitter_page">Twitter</string>
-    <string name="twitter_page_summary">Share your design with RSOUNDS</string>
+    <string name="twitter_page_summary">Visit the developer's Twitter profile.</string>
 
     <string name="unlabeled">Unlabeled</string>
 
@@ -552,4 +552,6 @@
     <string name="you_have_to_select_at_least_one_category">You have to select at least one category.</string>
     <string name="you_will_be_forwarded_to_the_issue_tracker_website">You will be forwarded to the issue tracker website.</string>
 
+    <string name="help_summary">Read answers to common RSOUNDS questions.</string>
+    <string name="version_summary">Installed version of RSOUNDS</string>
 </resources>

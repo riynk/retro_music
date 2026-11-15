@@ -7,7 +7,7 @@ body:
     attributes:
       label: Initial questions
       options:
-        - label: I have read the [FAQ](https://github.com/RetroMusicPlayer/RetroMusicPlayer/blob/master/FAQ.md).
+        - label: I have read the [FAQ](https://github.com/riynk/retro_music/blob/RS_DEV/FAQ.md).
           required: true
         - label: I have searched for similar bugs and have not found any.
           required: true
@@ -41,10 +41,10 @@ body:
   - type: textarea
     id: environment
     attributes:
-      label: Desktop
+      label: Device information
       value: |
         - Device: [e.g. OnePlus 7]
         - Android version: [e.g. Android 9]
-        - App version [e.g. 3.5.300_0517]
+        - App version [shown in About > Version]
     validations:
       required: true

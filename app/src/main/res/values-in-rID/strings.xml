@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="about_album_label">Tentang %s</string>
-    <string name="about_settings_summary">Tim, tautan sosial</string>
+    <string name="about_settings_summary">Pengembang, bantuan, dan tautan proyek</string>
     <string name="accent_color">Warna aksen</string>
     <string name="accent_color_desc">Warna aksen tema, default ke ungu</string>
     <string name="action_about">Tentang</string>
@@ -66,7 +66,7 @@
         <item quantity="other">Album</item>
     </plurals>
     <string name="always">Selalu</string>
-    <string name="app_share">Hai, cobalah pemutar musik keren ini di: https://play.google.com/store/apps/details?id=%s</string>
+    <string name="app_share">Lihat RSOUNDS, pemutar musik Android: https://github.com/riynk/retro_music</string>
     <string name="app_shortcut_shuffle_all_short">Acak</string>
     <string name="app_shortcut_top_tracks_short">Lagu Teratas</string>
     <string name="app_widget_big_name">Gambar penuh</string>
@@ -92,7 +92,7 @@
     <string name="blur">Keburaman</string>
     <string name="blur_card">Kartu buram</string>
     <string name="bug_report_manual">Kirim secara manual</string>
-    <string name="bug_report_summary">Terjadi kesalahan tak terduga. Maaf jika Anda menemukan bug ini, jika terus terjadi maka \"Hapus data aplikasi\" atau kirim Email </string>
+    <string name="bug_report_summary">Kirim laporan bug RSOUNDS melalui GitHub.</string>
     <string name="card">Kartu</string>
     <string name="card_color_style">Kartu Berwarna</string>
     <string name="card_square">Kartu Persegi</string>
@@ -118,7 +118,7 @@
     <string name="could_not_scan_files">Tidak dapat memindai %d berkas.</string>
     <string name="create_action">Buat</string>
     <string name="create_new_backup">Buat</string>
-    <string name="credit_title">Member dan kontributor </string>
+    <string name="credit_title">Pengembang dan pemelihara</string>
     <string name="currently_listening_to_x_by_x">Saat ini mendengarkan %1$s oleh %2$s.</string>
     <string name="custom_artist_images">Gambar Artis Kustom</string>
     <string name="customactivityoncrash_error_activity_error_details_share">Bagikan Laporan Kerusakan</string>
@@ -167,7 +167,7 @@
     <string name="general_settings_title">Tampilan dan nuansa</string>
     <string name="genre">Genre</string>
     <string name="genres">Genre</string>
-    <string name="git_hub_summary">Beri fork pada proyek di GitHub</string>
+    <string name="git_hub_summary">Lihat kode sumber RSOUNDS di GitHub.</string>
     <string name="gradient">Gradasi</string>
     <string name="grant_access">Izinkan akses</string>
     <string name="grid_size_1">1</string>
@@ -179,7 +179,7 @@
     <string name="grid_size_7">7</string>
     <string name="grid_size_8">8</string>
     <string name="grid_style_label">Gaya kisi</string>
-    <string name="help_summary">Butuh bantuan lebih?</string>
+    <string name="help_summary">Baca jawaban untuk pertanyaan umum tentang RSOUNDS.</string>
     <string name="hinge">Engsel</string>
     <string name="history">Riwayat</string>
     <string name="history_cleared">Riwayat dibersihkan</string>
@@ -469,11 +469,11 @@
     <string name="speech_prompt">Cari pustaka Anda</string>
     <string name="stack">Tumpukan</string>
     <string name="suggestion_songs">Saran</string>
-    <string name="support_development">Dukung pengembangan</string>
+    <string name="support_development">Proyek RSOUNDS</string>
     <string name="swipe_to_unlock">Geser untuk membuka</string>
     <string name="synced_lyrics">Lirik yang tersinkron</string>
     <string name="telegram_group">Telegram</string>
-    <string name="telegram_group_summary">Gabung grup telegram untuk diskusikan bug, buat saran, pamer dan lainnya</string>
+    <string name="telegram_group_summary">Hubungi pengembang RSOUNDS melalui Telegram.</string>
     <string name="the_audio_file">File audio</string>
     <string name="this_month">Bulan ini</string>
     <string name="this_week">Minggu ini</string>
@@ -489,7 +489,7 @@
     <string name="translate">Terjemahan</string>
     <string name="translate_community">Bantu kami terjemahkan aplikasi ke dalam bahasa Anda</string>
     <string name="twitter_page">Twitter</string>
-    <string name="twitter_page_summary">Bagikan desain Anda dengan Musik Retro</string>
+    <string name="twitter_page_summary">Kunjungi profil Twitter pengembang.</string>
     <string name="unlabeled">Tidak berlabel</string>
     <string name="unplayable_file">Tidak dapat\u2019 memutar lagu ini.</string>
     <string name="up_next">Berikutnya</string>
@@ -518,4 +518,6 @@
     <string name="scan_complete">Scan complete: %1$d media items found.</string>
     <string name="pref_save_last_directory_summary">When switching to folder view, restore last used directory</string>
     <string name="pref_save_last_directory_title">Save Last Directory</string>
+    <string name="instagram_summary">Buka profil Instagram RSOUNDS.</string>
+    <string name="version_summary">Versi aplikasi yang terpasang.</string>
 </resources>

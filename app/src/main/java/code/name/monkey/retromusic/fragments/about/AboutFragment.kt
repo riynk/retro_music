@@ -53,9 +53,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     private fun setUpView() {
         binding.aboutContent.cardRetroInfo.appGithub.setOnClickListener(this)
         binding.aboutContent.cardRetroInfo.faqLink.setOnClickListener(this)
-        binding.aboutContent.cardRetroInfo.appRate.setOnClickListener(this)
         binding.aboutContent.cardRetroInfo.appShare.setOnClickListener(this)
-        binding.aboutContent.cardRetroInfo.donateLink.setOnClickListener(this)
         binding.aboutContent.cardRetroInfo.bugReportLink.setOnClickListener(this)
 
         binding.aboutContent.cardSocial.telegramLink.setOnClickListener(this)
@@ -72,9 +70,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             R.id.telegramLink -> openUrl(Constants.APP_TELEGRAM_LINK)
             R.id.instagramLink -> openUrl(Constants.APP_INSTAGRAM_LINK)
             R.id.appGithub -> openUrl(Constants.GITHUB_PROJECT)
-            R.id.appRate -> openUrl(Constants.RATE_ON_GOOGLE_PLAY)
             R.id.appShare -> shareApp()
-            R.id.donateLink -> NavigationUtil.goToSupportDevelopment(requireActivity())
             R.id.twitterLink -> openUrl(Constants.APP_TWITTER_LINK)
             R.id.changelog -> NavigationUtil.gotoWhatNews(requireActivity())
             R.id.openSource -> NavigationUtil.goToOpenSource(requireActivity())
@@ -96,13 +92,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
     private fun shareApp() {
         ShareCompat.IntentBuilder(requireActivity()).setType("text/plain")
             .setChooserTitle(R.string.share_app)
-            .setText(
-                String.format(
-                    java.util.Locale.getDefault(),
-                    getString(R.string.app_share),
-                    requireActivity().packageName
-                )
-            )
+            .setText(getString(R.string.app_share))
             .startChooser()
     }
 

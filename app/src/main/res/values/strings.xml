@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="about_album_label">About %s</string>
-    <string name="about_settings_summary">Team, social links</string>
+    <string name="about_settings_summary">Developer, help and project links</string>
     <string name="accent_color">Accent color</string>
     <string name="accent_color_desc">The theme accent color, defaults to purple</string>
     <string name="action_about">About</string>
@@ -68,7 +68,7 @@
         <item quantity="other">Albums</item>
     </plurals>
     <string name="always">Always</string>
-    <string name="app_share">Hey check out this cool music player at: https://play.google.com/store/apps/details?id=%s</string>
+    <string name="app_share">Check out RSOUNDS, an Android music player: https://github.com/riynk/retro_music</string>
     <string name="app_shortcut_shuffle_all_short">Shuffle</string>
     <string name="app_shortcut_top_tracks_short">Top Tracks</string>
     <string name="app_widget_big_name">Full Image</string>
@@ -96,7 +96,7 @@
     <string name="blur">Blur</string>
     <string name="blur_card">Blur Card</string>
     <string name="bug_report_manual">Send manually</string>
-    <string name="bug_report_summary">An unexpected error occurred. Sorry you found this bug, if it keeps crashing \"Clear app data\" or send an Email </string>
+    <string name="bug_report_summary">Open the RSOUNDS bug report form on GitHub.</string>
     <string name="card">Card</string>
     <string name="card_color_style">Colored Card</string>
     <string name="card_square">Square Card</string>
@@ -122,7 +122,7 @@
     <string name="could_not_scan_files">Could not scan %d files.</string>
     <string name="create_action">Create</string>
     <string name="create_new_backup">Create</string>
-    <string name="credit_title">Members and contributors </string>
+    <string name="credit_title">Developer and maintainer</string>
     <string name="currently_listening_to_x_by_x">Currently listening to %1$s by %2$s.</string>
     <string name="custom_artist_images">Custom Artist Images</string>
     <string name="customactivityoncrash_error_activity_error_details_share">Share Crash Report</string>
@@ -171,7 +171,7 @@
     <string name="general_settings_title">Look and feel</string>
     <string name="genre">Genre</string>
     <string name="genres">Genres</string>
-    <string name="git_hub_summary">Fork the project on GitHub</string>
+    <string name="git_hub_summary">View the RSOUNDS source code on GitHub.</string>
     <string name="gradient">Gradient</string>
     <string name="grant_access">Grant access</string>
     <string name="grid_size_1">1</string>
@@ -183,7 +183,7 @@
     <string name="grid_size_7">7</string>
     <string name="grid_size_8">8</string>
     <string name="grid_style_label">Grid style</string>
-    <string name="help_summary">Need more help?</string>
+    <string name="help_summary">Read answers to common RSOUNDS questions.</string>
     <string name="hinge">Hinge</string>
     <string name="history">History</string>
     <string name="history_cleared">History cleared</string>
@@ -468,11 +468,11 @@
     <string name="speech_prompt">Search your library</string>
     <string name="stack">Stack</string>
     <string name="suggestion_songs">Suggestions</string>
-    <string name="support_development">Support development</string>
+    <string name="support_development">RSOUNDS project</string>
     <string name="swipe_to_unlock">Swipe to unlock</string>
     <string name="synced_lyrics">Synced lyrics</string>
     <string name="telegram_group">Telegram</string>
-    <string name="telegram_group_summary">Join the Telegram group to discuss bugs, make suggestions, show off and more</string>
+    <string name="telegram_group_summary">Message the RSOUNDS developer on Telegram.</string>
     <string name="the_audio_file">The audio file</string>
     <string name="this_month">This month</string>
     <string name="this_week">This week</string>
@@ -488,7 +488,7 @@
     <string name="translate">Translate</string>
     <string name="translate_community">Help us translate the app to your language</string>
     <string name="twitter_page">Twitter</string>
-    <string name="twitter_page_summary">Share your design with RSOUNDS</string>
+    <string name="twitter_page_summary">Visit the developer's Twitter profile.</string>
     <string name="unlabeled">Unlabeled</string>
     <string name="unplayable_file">Couldn\u2019t play this song.</string>
     <string name="up_next">Up next</string>
@@ -571,4 +571,5 @@
     <string name="lyrics_source_ttml_missing">No TTML lyric file found. Choose Automatic or LRC to use another available source.</string>
     <string name="pref_lyrics_translation_language_summary">Default target language used when translation is enabled for an individual song</string>
 
+    <string name="version_summary">Installed version of RSOUNDS</string>
 </resources>

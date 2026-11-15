@@ -28,7 +28,7 @@ object Constants {
     const val APP_INSTAGRAM_LINK = "https://www.instagram.com/riynkk_/"
     const val APP_TWITTER_LINK = "https://twitter.com/RiynkkAzis"
     const val FAQ_LINK = "https://github.com/riynk/retro_music/blob/RS_DEV/FAQ.md"
-    const val BUG_REPORT_LINK = "https://github.com/riynk/retro_music/issues/new"
+    const val BUG_REPORT_LINK = "https://github.com/riynk/retro_music/issues/new?template=bug-report.yml"
     const val AUDIO_SCROBBLER_URL = "https://ws.audioscrobbler.com/2.0/"
 
     const val IS_MUSIC =
