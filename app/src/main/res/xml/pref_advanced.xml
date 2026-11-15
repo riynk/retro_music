@@ -15,7 +15,7 @@
         android:key="library_management_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_library"
-        app:icon="@drawable/ic_library_music">
+        android:icon="@drawable/ic_library_music">
         <code.name.monkey.retromusic.preferences.BlacklistPreference
             android:key="blacklist"
             android:layout="@layout/list_item_view"
@@ -62,7 +62,7 @@
         android:key="app_behavior_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_advanced"
-        app:icon="@drawable/ic_settings">
+        android:icon="@drawable/ic_settings">
 
 
         
