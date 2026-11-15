@@ -37,7 +37,7 @@
         android:key="lyrics_settings"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_lyrics"
-        app:icon="@drawable/ic_lyrics">
+        android:icon="@drawable/ic_lyrics">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
             android:icon="@drawable/ic_lyrics"
@@ -90,7 +90,7 @@
                 android:key="lyrics_appearance_settings"
                 android:layout="@layout/list_item_view"
                 android:title="@string/pref_header_lyrics_appearance"
-                app:icon="@drawable/ic_lyrics_outline">
+                android:icon="@drawable/ic_lyrics_outline">
         
                 <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
                     android:defaultValue="5"
@@ -214,7 +214,7 @@
         android:key="album_style_settings"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_album"
-        app:icon="@drawable/ic_image">
+        android:icon="@drawable/ic_image">
 
         <code.name.monkey.retromusic.preferences.AlbumCoverStylePreference
             android:key="album_cover_style_id"
@@ -244,7 +244,7 @@
         android:key="now_playing_controls_settings"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_controls"
-        app:icon="@drawable/ic_play_arrow">
+        android:icon="@drawable/ic_play_arrow">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
                 android:icon="@drawable/ic_play_circle_filled"
