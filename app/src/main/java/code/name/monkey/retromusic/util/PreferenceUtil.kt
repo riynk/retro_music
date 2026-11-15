@@ -159,7 +159,25 @@ object PreferenceUtil {
                 gson.toJson(defaultCategories, collectionType)
             )
             return try {
-                Gson().fromJson(data, collectionType)
+                val categories: List<CategoryInfo> = Gson().fromJson(data, collectionType)
+                val previousDefault = listOf(
+                    CategoryInfo(CategoryInfo.Category.Home, true),
+                    CategoryInfo(CategoryInfo.Category.Songs, true),
+                    CategoryInfo(CategoryInfo.Category.Albums, true),
+                    CategoryInfo(CategoryInfo.Category.Artists, true),
+                    CategoryInfo(CategoryInfo.Category.Playlists, true),
+                    CategoryInfo(CategoryInfo.Category.Genres, false),
+                    CategoryInfo(CategoryInfo.Category.Folder, false),
+                    CategoryInfo(CategoryInfo.Category.Search, false)
+                )
+                if (categories == previousDefault) {
+                    sharedPreferences.edit {
+                        putString(LIBRARY_CATEGORIES, Gson().toJson(defaultCategories, collectionType))
+                    }
+                    defaultCategories
+                } else {
+                    categories
+                }
             } catch (e: JsonSyntaxException) {
                 e.printStackTrace()
                 return defaultCategories
