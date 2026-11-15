@@ -173,7 +173,6 @@ dependencies {
     implementation(libs.tankery.circularSeekBar)
 
     implementation(libs.androidx.exoplayer)
-    implementation(libs.mlkit.translate)
     implementation(libs.mlkit.language.id)
 }
 

@@ -365,8 +365,8 @@
     <string name="lyrics_status_lrc_lines">LRC · tersinkron per baris</string>
     <string name="lyrics_source_ttml_missing">File lirik TTML tidak ditemukan. Pilih Otomatis atau LRC untuk memakai sumber lain yang tersedia.</string>
     <string name="pref_lyrics_translation_language_summary">Bahasa tujuan yang digunakan saat terjemahan diaktifkan untuk lagu tertentu.</string>
-    <string name="lyrics_translation_loading">Menyiapkan terjemahan di perangkat untuk lagu ini…</string>
-    <string name="lyrics_translation_failed">Terjemahan gagal dimulai. Periksa koneksi dan model bahasa, lalu ketuk untuk mencoba lagi.</string>
+    <string name="lyrics_translation_loading">Menerjemahkan lirik secara online…</string>
+    <string name="lyrics_translation_failed">Terjemahan online gagal. Periksa koneksi internet, lalu ketuk untuk mencoba lagi.</string>
     <string name="pref_title_manage_audio_focus">Selalu putar</string>
     <string name="pref_title_now_playing_screen_appearance">Tema Pemutaran</string>
     <string name="pref_title_open_source_licences">Lisensi sumber terbuka</string>

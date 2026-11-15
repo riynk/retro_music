@@ -532,7 +532,7 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
                 }
 
                 val highlightWords = preferences.getBoolean("lyrics_word_highlight", true)
-                // Do not wait for ML Kit to finish its model download before showing lyrics.
+                // Keep the original timed lyrics visible while the online service translates them.
                 binding.karaokeLyricsView.setDocument(document, null, highlightWords)
                 setLyricsSourceSubtitle(
                     document.sourceFormat,

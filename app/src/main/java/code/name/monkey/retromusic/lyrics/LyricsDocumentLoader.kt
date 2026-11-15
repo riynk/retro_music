@@ -10,7 +10,7 @@ import code.name.monkey.retromusic.lyrics.model.LyricDocument
 import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
 import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
 import code.name.monkey.retromusic.lyrics.translation.LyricsTranslationCache
-import code.name.monkey.retromusic.lyrics.translation.MlKitLyricsTranslator
+import code.name.monkey.retromusic.lyrics.translation.OnlineLyricsTranslator
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.LyricUtil
 import kotlinx.coroutines.CancellationException
@@ -27,7 +27,7 @@ data class LoadedLyrics(
 
 /**
  * Loads local lyric files independently from translation so karaoke can start
- * immediately. Translation may need a large on-device model download.
+ * immediately. Translation is sent to the online provider after local parsing.
  */
 object LyricsDocumentLoader {
     suspend fun loadDocument(context: Context, song: Song): LyricDocument? =
@@ -73,19 +73,21 @@ object LyricsDocumentLoader {
                     .toByteArray(Charsets.UTF_8)
             )
             .joinToString("") { byte -> "%02x".format(byte.toInt() and 0xff) }
+        // Keep old on-device translations from being mistaken for online results.
+        val engineCacheKey = "mymemory_online_v1_$lyricsHash"
         val cache = LyricsTranslationCache(appContext)
-        val cached = cache.get(songKey, targetLanguage, lyricsHash)
+        val cached = cache.get(songKey, targetLanguage, engineCacheKey)
             ?.takeIf { it.size == document.lines.size }
         if (cached != null) return@withContext cached
 
-        val translated = MlKitLyricsTranslator.translate(
+        val translated = OnlineLyricsTranslator.translate(
             document.lines.map { it.text },
             targetLanguage
         )
         if (translated.size != document.lines.size) {
             throw IllegalStateException("The translation result does not match the lyric lines")
         }
-        cache.put(songKey, targetLanguage, lyricsHash, translated)
+        cache.put(songKey, targetLanguage, engineCacheKey, translated)
         translated
     }
 
