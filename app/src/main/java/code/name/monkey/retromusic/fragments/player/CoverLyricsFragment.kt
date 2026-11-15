@@ -66,10 +66,22 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         }
 
         lyricsView.apply {
-            setCompactLineCount(
-                PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getInt("lyrics_over_line_count", 3)
-            )
+            val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val lineCount = try {
+                preferences.getString("lyrics_over_line_count", "3")?.toIntOrNull() ?: 3
+            } catch (_: ClassCastException) {
+                // Older builds may have stored this preference as an integer.
+                val legacyValue = try {
+                    preferences.getInt("lyrics_over_line_count", 3)
+                } catch (_: ClassCastException) {
+                    3
+                }
+                preferences.edit()
+                    .putString("lyrics_over_line_count", legacyValue.toString())
+                    .apply()
+                legacyValue
+            }
+            setCompactLineCount(lineCount.coerceIn(1, 5))
             setCompactMode(true)
             setStyle(LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER))
             setOnLineClickListener { time ->
