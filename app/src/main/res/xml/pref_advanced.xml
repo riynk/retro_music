@@ -2,40 +2,57 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <code.name.monkey.retromusic.preferences.BlacklistPreference
-        android:key="blacklist"
+
+
+
+
+    
+    
+
+
+
+    <androidx.preference.PreferenceScreen
+        android:key="library_management_preferences"
         android:layout="@layout/list_item_view"
-        android:summary="@string/pref_summary_blacklist"
-        android:title="@string/pref_header_blacklist"
-        app:icon="@drawable/ic_music_note_off" />
-
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
-        android:icon="@drawable/ic_library_music"
-        android:defaultValue="false"
-        android:key="whitelist_music"
-        android:layout="@layout/list_item_view_switch"
-        android:summary="@string/pref_summary_whitelist"
-        android:title="@string/pref_title_whitelist" />
-
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
-        android:layout="@layout/preference_category_title"
-        android:title="@string/pref_header_playlists">
-
-        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
-            android:defaultValue="this_month"
-            android:entries="@array/pref_playlists_last_added_interval_titles"
-            android:entryValues="@array/pref_playlists_last_added_interval_values"
-            android:key="last_added_interval"
+        android:title="@string/pref_header_library"
+        app:icon="@drawable/ic_library_music">
+        <code.name.monkey.retromusic.preferences.BlacklistPreference
+            android:key="blacklist"
             android:layout="@layout/list_item_view"
-            android:negativeButtonText="@null"
-            android:positiveButtonText="@null"
-            android:title="@string/pref_title_last_added_interval"
-            app:icon="@drawable/ic_playlist_add" />
+            android:summary="@string/pref_summary_blacklist"
+            android:title="@string/pref_header_blacklist"
+            app:icon="@drawable/ic_music_note_off" />
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+            android:icon="@drawable/ic_library_music"
+            android:defaultValue="false"
+            android:key="whitelist_music"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_summary_whitelist"
+            android:title="@string/pref_title_whitelist" />
+<code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+            android:layout="@layout/preference_category_title"
+            android:title="@string/pref_header_playlists">
 
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
-        android:layout="@layout/preference_category_title"
-        android:title="@string/pref_header_advanced">
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:defaultValue="this_month"
+                android:entries="@array/pref_playlists_last_added_interval_titles"
+                android:entryValues="@array/pref_playlists_last_added_interval_values"
+                android:key="last_added_interval"
+                android:layout="@layout/list_item_view"
+                android:negativeButtonText="@null"
+                android:positiveButtonText="@null"
+                android:title="@string/pref_title_last_added_interval"
+                app:icon="@drawable/ic_playlist_add" />
+
+        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </androidx.preference.PreferenceScreen>
+
+    <androidx.preference.PreferenceScreen
+        android:key="app_behavior_preferences"
+        android:layout="@layout/list_item_view"
+        android:title="@string/pref_header_advanced"
+        app:icon="@drawable/ic_settings">
+
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
             android:defaultValue="30"
@@ -80,16 +97,16 @@
             android:icon="@drawable/ic_folder" />
 
 
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
-
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
-        android:defaultValue="auto"
-        android:entries="@array/pref_language_names"
-        android:entryValues="@array/pref_language_codes"
-        android:key="language_name"
-        android:layout="@layout/list_item_view"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_language_name"
-        android:icon="@drawable/ic_language" />
+    
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+            android:defaultValue="auto"
+            android:entries="@array/pref_language_names"
+            android:entryValues="@array/pref_language_codes"
+            android:key="language_name"
+            android:layout="@layout/list_item_view"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_language_name"
+            android:icon="@drawable/ic_language" />
+    </androidx.preference.PreferenceScreen>
 </androidx.preference.PreferenceScreen>
