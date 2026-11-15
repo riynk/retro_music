@@ -5,7 +5,7 @@
         android:key="home_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/home"
-        app:icon="@drawable/ic_home">
+        android:icon="@drawable/ic_home">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
             android:defaultValue="0"
@@ -59,7 +59,7 @@
         android:key="library_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_library"
-        app:icon="@drawable/ic_library_music">
+        android:icon="@drawable/ic_library_music">
 
         <code.name.monkey.retromusic.preferences.LibraryPreference
             android:key="library_categories"
@@ -119,7 +119,7 @@
         android:key="window_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/window"
-        app:icon="@drawable/ic_fullscreen">
+        android:icon="@drawable/ic_fullscreen">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="false"
@@ -134,7 +134,7 @@
         android:key="lockscreen_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_lockscreen"
-        app:icon="@drawable/ic_screen_lock_portrait">
+        android:icon="@drawable/ic_screen_lock_portrait">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
         android:icon="@drawable/ic_image"
@@ -167,7 +167,7 @@
         android:key="artwork_preferences"
         android:layout="@layout/list_item_view"
         android:title="@string/pref_header_images"
-        app:icon="@drawable/ic_image">
+        android:icon="@drawable/ic_image">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="true"
