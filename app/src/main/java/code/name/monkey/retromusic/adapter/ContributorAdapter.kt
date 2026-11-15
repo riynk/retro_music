@@ -86,8 +86,16 @@ class ContributorAdapter(
         internal fun bindData(contributor: Contributor) {
             title.text = contributor.name
             text.text = contributor.summary
+            val imagePath = contributor.image.trim()
+            val imageSource = if (
+                imagePath.startsWith("https://") || imagePath.startsWith("http://")
+            ) {
+                imagePath
+            } else {
+                "file:///android_asset/images/$imagePath"
+            }
             Glide.with(image.context)
-                .load("file:///android_asset/images/${contributor.image}".toUri())
+                .load(imageSource.toUri())
                 .error(R.drawable.ic_account)
                 .placeholder(R.drawable.ic_account)
                 .into(image)

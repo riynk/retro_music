@@ -21,7 +21,7 @@ object Constants {
     const val RATE_ON_GOOGLE_PLAY =
         "https://play.google.com/store/apps/details?id=app.riynk.rsounds"
     const val GITHUB_PROJECT = "https://github.com/riynk/retro_music"
-    const val TELEGRAM_CHANGE_LOG = "https://t.me/retromusiclog"
+    const val TELEGRAM_CHANGE_LOG = "https://t.me/riyankazis"
     const val USER_PROFILE = "profile.jpg"
     const val USER_BANNER = "banner.jpg"
     const val APP_TELEGRAM_LINK = "https://t.me/riyankazis"
