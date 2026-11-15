@@ -33,9 +33,11 @@
         android:layout="@layout/list_item_view_switch_no_title"
         android:title="@string/pref_snow_fall_title" />
 
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
-        android:layout="@layout/preference_category_title"
-        android:title="@string/pref_header_lyrics">
+    <androidx.preference.PreferenceScreen
+        android:key="lyrics_settings"
+        android:layout="@layout/list_item_view"
+        android:title="@string/pref_header_lyrics"
+        app:icon="@drawable/ic_lyrics">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
             android:icon="@drawable/ic_lyrics"
@@ -82,11 +84,24 @@
                 android:title="@string/pref_lyrics_translation_language"
                 android:summary="@string/pref_lyrics_translation_language_summary" />
         </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </androidx.preference.PreferenceScreen>
 
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
-        android:layout="@layout/preference_category_title"
-        android:title="@string/pref_header_lyrics_appearance">
+    <androidx.preference.PreferenceScreen
+        android:key="lyrics_appearance_settings"
+        android:layout="@layout/list_item_view"
+        android:title="@string/pref_header_lyrics_appearance"
+        app:icon="@drawable/ic_lyrics_outline">
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESeekBarPreference
+            android:defaultValue="5"
+            android:key="lyrics_line_spacing"
+            android:layout="@layout/list_item_view_seekbar"
+            android:max="20"
+            android:min="0"
+            android:title="@string/pref_lyrics_line_spacing"
+            android:summary="@string/pref_lyrics_line_spacing_summary"
+            app:showSeekBarValue="true" />
+
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
             android:layout="@layout/preference_category_title"
@@ -186,7 +201,7 @@
                 android:layout="@layout/list_item_view"
                 android:title="@string/pref_lyrics_alignment" />
         </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </androidx.preference.PreferenceScreen>
 
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
         android:icon="@drawable/ic_play_circle_filled"
@@ -203,9 +218,11 @@
         android:summary="@string/pref_summary_swipe_anywhere_now_playing"
         android:title="@string/pref_title_swipe_anywhere_now_playing" />
 
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
-        android:layout="@layout/preference_category_title"
-        android:title="@string/pref_header_album">
+    <androidx.preference.PreferenceScreen
+        android:key="album_style_settings"
+        android:layout="@layout/list_item_view"
+        android:title="@string/pref_header_album"
+        app:icon="@drawable/ic_image">
 
         <code.name.monkey.retromusic.preferences.AlbumCoverStylePreference
             android:key="album_cover_style_id"
@@ -229,11 +246,13 @@
             app:key="carousel_effect"
             app:summary="@string/pref_summary_carousel_effect"
             app:title="@string/pref_title_toggle_carousel_effect" />
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </androidx.preference.PreferenceScreen>
 
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
-        android:layout="@layout/preference_category_title"
-        android:title="@string/pref_header_controls">
+    <androidx.preference.PreferenceScreen
+        android:key="now_playing_controls_settings"
+        android:layout="@layout/list_item_view"
+        android:title="@string/pref_header_controls"
+        app:icon="@drawable/ic_play_arrow">
 
         <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
             android:icon="@drawable/ic_expand_less"
@@ -277,5 +296,5 @@
             app:ateKey_pref_unit="px"
             android:icon="@drawable/ic_blur_on"
             app:showSeekBarValue="true" />
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </androidx.preference.PreferenceScreen>
 </androidx.preference.PreferenceScreen>
