@@ -62,9 +62,9 @@ class KaraokeLyricsView @JvmOverloads constructor(
     private var accentTextColor = resolveThemeColor(android.R.attr.colorAccent, 0xFF80CBC4.toInt())
 
     init {
-        // Keep the scroll surface and its internal text column fully transparent.
-        setBackgroundColor(Color.TRANSPARENT)
-        content.setBackgroundColor(Color.TRANSPARENT)
+        // The lyrics renderer itself must not contribute a background drawable.
+        background = null
+        content.background = null
         isFillViewport = true
         isVerticalScrollBarEnabled = false
         overScrollMode = OVER_SCROLL_NEVER
@@ -185,7 +185,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
 
         value.lines.forEachIndexed { index, line ->
             val lyric = TextView(context).apply {
-                setLineSpacing(dp(5).toFloat(), 1f)
+                setLineSpacing(dp(style.lineSpacingDp).toFloat(), 1f)
                 setPadding(dp(12), dp(12), dp(12), dp(2))
                 isClickable = true
                 isFocusable = true
