@@ -16,7 +16,8 @@
         android:name="code.name.monkey.retromusic.fragments.player.CoverLyricsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:elevation="20dp" />
 
     <com.bosphere.fadingedgelayout.FadingEdgeLayout
         android:id="@+id/fading_edge_layout"

@@ -200,6 +200,9 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         val artwork = findCurrentArtworkView() as? ImageView
         if (artwork == null || artwork.width <= 0 || artwork.height <= 0) {
             restoreArtworkDimming()
+            // Never fall back to the full player slot: Over Cover belongs only
+            // inside the bounds of a real, laid-out album artwork view.
+            binding.playerLyrics.isVisible = false
             return
         }
         applyArtworkDimming(artwork)
@@ -242,6 +245,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         binding.playerLyrics.clipToOutline = true
         binding.playerLyrics.clipChildren = true
         binding.playerLyrics.clipToPadding = true
+        binding.playerLyrics.isVisible = shouldShowOverCoverLyrics()
     }
 
     private fun updateLyrics() {

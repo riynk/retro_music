@@ -14,6 +14,8 @@ import androidx.fragment.app.FragmentActivity
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.activities.base.AbsSlidingMusicPanelActivity
+import code.name.monkey.retromusic.fragments.NowPlayingScreen
 import code.name.monkey.retromusic.util.PreferenceUtil
 
 fun AppCompatActivity.maybeSetScreenOn() {
@@ -92,7 +94,13 @@ fun AppCompatActivity.hideStatusBar() {
 private fun AppCompatActivity.hideStatusBar(fullscreen: Boolean) {
     val statusBar = window.decorView.rootView.findViewById<View>(R.id.status_bar)
     if (statusBar != null) {
-        statusBar.isGone = fullscreen
+        // Plain Atmosphere deliberately keeps this spacer in immersive mode.
+        // AbsPlayerFragment's opt-out is not enough because this activity-level
+        // callback runs again whenever the window regains focus.
+        val keepPlayerSpacer = fullscreen &&
+            this is AbsSlidingMusicPanelActivity &&
+            PreferenceUtil.nowPlayingScreen == NowPlayingScreen.PlainAtmosphere
+        statusBar.isGone = fullscreen && !keepPlayerSpacer
     }
 }
 
