@@ -42,7 +42,7 @@ class NowPlayingSettingsFragment : AbsSettingsFragment(),
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.pref_now_playing_screen)
+        setPreferencesFromResource(R.xml.pref_now_playing_screen, rootKey)
     }
 
     private fun updateAtmosphereBackgroundVisibility() {
