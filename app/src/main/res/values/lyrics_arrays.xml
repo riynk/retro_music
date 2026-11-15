@@ -50,4 +50,19 @@
         <item>right</item>
     </string-array>
 
+    <string-array name="pref_lyrics_line_count_names">
+        <item>1 line</item>
+        <item>2 lines</item>
+        <item>3 lines</item>
+        <item>4 lines</item>
+        <item>5 lines</item>
+    </string-array>
+    <string-array name="pref_lyrics_line_count_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
 </resources>
