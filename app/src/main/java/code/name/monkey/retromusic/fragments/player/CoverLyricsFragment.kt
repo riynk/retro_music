@@ -52,6 +52,10 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCoverLyricsBinding.bind(view)
+        // Over Cover is text directly on the artwork: never draw a panel behind it.
+        binding.root.setBackgroundColor(Color.TRANSPARENT)
+        binding.playerLyrics.setBackgroundColor(Color.TRANSPARENT)
+        binding.lyricsView.setBackgroundColor(Color.TRANSPARENT)
         progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
         attachArtworkBoundsTracking()
 
