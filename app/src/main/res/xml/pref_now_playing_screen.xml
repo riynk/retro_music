@@ -119,6 +119,16 @@
                 app:showSeekBarValue="true" />
 
             <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:icon="@drawable/ic_lyrics"
+                android:defaultValue="3"
+                android:entries="@array/pref_lyrics_line_count_names"
+                android:entryValues="@array/pref_lyrics_line_count_values"
+                android:key="lyrics_over_line_count"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_visible_lines"
+                android:summary="@string/pref_lyrics_visible_lines_summary" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
         android:icon="@drawable/ic_font"
                 android:defaultValue="sans-serif"
                 android:entries="@array/pref_lyrics_font_names"
