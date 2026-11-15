@@ -124,9 +124,13 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
                         LyricsDisplaySettings.read(requireContext(), LyricsSurface.OVER_COVER)
                     )
                     if (key == "lyrics_over_line_count") {
-                        lyricsView.setCompactLineCount(
+                        val lineCount = try {
+                            sharedPreferences.getString("lyrics_over_line_count", "3")
+                                ?.toIntOrNull() ?: 3
+                        } catch (_: ClassCastException) {
                             sharedPreferences.getInt("lyrics_over_line_count", 3)
-                        )
+                        }
+                        lyricsView.setCompactLineCount(lineCount.coerceIn(1, 5))
                     }
                     updateLyrics()
                 }
