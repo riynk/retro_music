@@ -5,6 +5,7 @@ on:
     branches:
       - feature/musixmatch-lyrics-translation
       - RS_DEV
+      - RSOUND
   pull_request:
     branches:
       - Ry_DEV

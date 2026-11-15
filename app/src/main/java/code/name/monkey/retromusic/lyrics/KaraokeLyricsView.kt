@@ -122,9 +122,7 @@ class KaraokeLyricsView @JvmOverloads constructor(
         secondaryTextColor = secondaryColor
         if (accentColor != null) accentTextColor = accentColor
         document?.let { renderLines(it, currentLine) }
-        translationStatusView?.setTextColor(
-            inactiveTextColor(document?.sourceFormat.equals("ttml", ignoreCase = true))
-        )
+        translationStatusView?.setTextColor(translationTextColor())
     }
 
     fun setTranslationStatus(message: String?) {
