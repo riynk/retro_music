@@ -79,7 +79,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener {
             R.id.changelog -> NavigationUtil.gotoWhatNews(requireActivity())
             R.id.openSource -> NavigationUtil.goToOpenSource(requireActivity())
             R.id.bugReportLink -> openUrl(Constants.BUG_REPORT_LINK)
-            R.id.websiteLink -> openUrl(Constants.WEBSITE)
         }
     }
 
