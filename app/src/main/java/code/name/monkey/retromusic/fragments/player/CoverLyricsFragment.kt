@@ -55,12 +55,6 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         progressViewUpdateHelper = MusicProgressViewUpdateHelper(this, 33, 500)
         attachArtworkBoundsTracking()
 
-        if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.Fit ||
-            PreferenceUtil.nowPlayingScreen == NowPlayingScreen.Full
-        ) {
-            binding.root.background = null
-        }
-
         lyricsView.apply {
             val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val lineCount = try {
@@ -161,7 +155,7 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
         } else {
             // This fragment is a sibling of the artwork ViewPager's fading-edge
             // layer. Keep the Over Cover lyrics container above that layer so the
-            // user sees timed lyrics over the cover, not just a dimmed image.
+            // user sees timed lyrics directly over the album artwork.
             (binding.root.parent as? View)?.bringToFront()
             binding.playerLyrics.alpha = 1f
             binding.root.post { updateLyricsBounds() }
