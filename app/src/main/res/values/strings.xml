@@ -549,6 +549,8 @@
     <string name="pref_lyrics_text_size">Text size (sp)</string>
     <string name="pref_lyrics_font_family">Font family</string>
     <string name="pref_lyrics_alignment">Text alignment</string>
+    <string name="pref_lyrics_visible_lines">Visible lyric lines</string>
+    <string name="pref_lyrics_visible_lines_summary">Choose how many lyric lines appear over the album cover</string>
     <string name="lyrics_translation_loading">Preparing the offline translation model…</string>
     <string name="lyrics_translation_failed">Offline translation could not be prepared. Check your connection for the first model download, then tap here to retry.</string>
     <string name="lyrics_translation_attribution">Powered by Google Translate</string>
