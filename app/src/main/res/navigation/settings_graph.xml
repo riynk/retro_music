@@ -90,17 +90,68 @@
     <fragment
         android:id="@+id/nowPlayingSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.NowPlayingSettingsFragment"
-        android:label="Now Playing" />
+        android:label="Now Playing">
+        <argument
+            android:name="androidx.preference.PreferenceFragmentCompat.PREFERENCE_ROOT"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="settings_screen_title"
+            app:argType="string"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_nowPlayingSettingsFragment_to_subscreen"
+            app:destination="@id/nowPlayingSettingsFragment"
+            app:enterAnim="@anim/retro_fragment_open_enter"
+            app:exitAnim="@anim/retro_fragment_open_exit"
+            app:popEnterAnim="@anim/retro_fragment_close_enter"
+            app:popExitAnim="@anim/retro_fragment_close_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/otherSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.OtherSettingsFragment"
-        android:label="Other" />
+        android:label="Other">
+        <argument
+            android:name="androidx.preference.PreferenceFragmentCompat.PREFERENCE_ROOT"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="settings_screen_title"
+            app:argType="string"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_otherSettingsFragment_to_subscreen"
+            app:destination="@id/otherSettingsFragment"
+            app:enterAnim="@anim/retro_fragment_open_enter"
+            app:exitAnim="@anim/retro_fragment_open_exit"
+            app:popEnterAnim="@anim/retro_fragment_close_enter"
+            app:popExitAnim="@anim/retro_fragment_close_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/personalizeSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.PersonalizeSettingsFragment"
-        android:label="Personalize" />
+        android:label="Personalize">
+        <argument
+            android:name="androidx.preference.PreferenceFragmentCompat.PREFERENCE_ROOT"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="settings_screen_title"
+            app:argType="string"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_personalizeSettingsFragment_to_subscreen"
+            app:destination="@id/personalizeSettingsFragment"
+            app:enterAnim="@anim/retro_fragment_open_enter"
+            app:exitAnim="@anim/retro_fragment_open_exit"
+            app:popEnterAnim="@anim/retro_fragment_close_enter"
+            app:popExitAnim="@anim/retro_fragment_close_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/themeSettingsFragment"
