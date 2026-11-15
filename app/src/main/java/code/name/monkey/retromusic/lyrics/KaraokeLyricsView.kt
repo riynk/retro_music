@@ -62,9 +62,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
     private var accentTextColor = resolveThemeColor(android.R.attr.colorAccent, 0xFF80CBC4.toInt())
 
     init {
-        // The lyrics renderer itself must not contribute a background drawable.
-        background = null
-        content.background = null
         isFillViewport = true
         isVerticalScrollBarEnabled = false
         overScrollMode = OVER_SCROLL_NEVER
