@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/musixmatch-lyrics-translation
+      - RS_DEV
   pull_request:
     branches:
       - Ry_DEV
