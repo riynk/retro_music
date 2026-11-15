@@ -153,15 +153,35 @@ object OnDeviceLyricsTranslator {
     ): List<String>? {
         if (batch.isEmpty()) return emptyList()
 
-        val translated = Tasks.await(translator.translate(batch.joinToString("\n")))
-            .replace("\r\n", "\n")
-            .trim()
-        val translatedLines = translated.split('\n').map(String::trim)
-
-        return translatedLines.takeIf { result ->
-            result.size == batch.size && result.all { it.isNotBlank() }
+        // ML Kit may remove newline characters. Use code-like markers so each
+        // translated segment can be mapped back to its original lyric line.
+        // If a marker is changed or dropped, return null and use line fallback.
+        val markers = batch.indices.map(::lineMarker)
+        val markedText = batch.indices.joinToString(separator = " ") { index ->
+            "${batch[index]} ${markers[index]}"
         }
+        val translated = Tasks.await(translator.translate(markedText)).trim()
+
+        val translatedLines = ArrayList<String>(batch.size)
+        var cursor = 0
+        markers.forEach { marker ->
+            val markerPosition = translated.indexOf(marker, cursor)
+            if (markerPosition < 0) return null
+
+            val translatedLine = translated.substring(cursor, markerPosition).trim()
+            if (translatedLine.isBlank()) return null
+
+            translatedLines += translatedLine
+            cursor = markerPosition + marker.length
+        }
+
+        val trailingText = translated.substring(cursor).trim()
+        if (trailingText.any { it.isLetterOrDigit() }) return null
+        return translatedLines
     }
+
+    private fun lineMarker(index: Int): String =
+        "ZXQ${index.toString().padStart(4, '0')}QXZ"
 
     private suspend fun translateIndividually(
         translator: Translator,
