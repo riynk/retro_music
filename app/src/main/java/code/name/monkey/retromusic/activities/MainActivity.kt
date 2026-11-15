@@ -17,6 +17,13 @@ package code.name.monkey.retromusic.activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.graphics.Color
+import android.graphics.Typeface
 import android.provider.MediaStore
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -73,12 +80,55 @@ class MainActivity : AbsCastActivity(), PreferenceFragmentCompat.OnPreferenceSta
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         splashScreen.setOnExitAnimationListener { provider ->
-            provider.view.animate()
+            val density = resources.displayMetrics.density
+            val brand = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                alpha = 0f
+                addView(TextView(this@MainActivity).apply {
+                    text = "RSOUNDS"
+                    setTextColor(Color.WHITE)
+                    textSize = 22f
+                    letterSpacing = 0.18f
+                    typeface = Typeface.DEFAULT_BOLD
+                    gravity = Gravity.CENTER
+                })
+                addView(TextView(this@MainActivity).apply {
+                    text = "YOUR MUSIC • YOUR SOUND"
+                    setTextColor(0xFFB8B8C2.toInt())
+                    textSize = 10f
+                    letterSpacing = 0.12f
+                    gravity = Gravity.CENTER
+                    setPadding(0, (8 * density).toInt(), 0, 0)
+                })
+            }
+            (provider.view as? ViewGroup)?.addView(
+                brand,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER
+                ).apply { topMargin = (142 * density).toInt() }
+            )
+            provider.iconView.animate()
                 .alpha(0f)
-                .scaleX(1.04f)
-                .scaleY(1.04f)
-                .setDuration(220L)
-                .withEndAction { provider.remove() }
+                .rotation(10f)
+                .scaleX(1.12f)
+                .scaleY(1.12f)
+                .setDuration(620L)
+                .start()
+            brand.animate()
+                .alpha(1f)
+                .translationY((-6 * density))
+                .setDuration(260L)
+                .withEndAction {
+                    brand.animate()
+                        .alpha(0f)
+                        .setStartDelay(380L)
+                        .setDuration(200L)
+                        .withEndAction { provider.remove() }
+                        .start()
+                }
                 .start()
         }
         super.onCreate(savedInstanceState)

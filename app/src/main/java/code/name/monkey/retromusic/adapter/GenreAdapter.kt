@@ -34,7 +34,9 @@ import code.name.monkey.retromusic.util.MusicUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.bumptech.glide.Glide
 import java.util.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @author Hemanth S (h4h13).
@@ -83,14 +85,16 @@ class GenreAdapter(
         }
 
         activity.lifecycleScope.launch {
-            val distinctArtistSongs = runCatching {
-                MusicUtil.songsByGenre(genre.id)
-                    .asSequence()
-                    .filter { it.artistId >= 0L && it.artistName.isNotBlank() }
-                    .distinctBy { it.artistId }
-                    .take(3)
-                    .toList()
-            }.getOrDefault(emptyList())
+            val distinctArtistSongs = withContext(Dispatchers.IO) {
+                runCatching {
+                    MusicUtil.songsByGenre(genre.id)
+                        .asSequence()
+                        .filter { it.artistId >= 0L && it.artistName.isNotBlank() }
+                        .distinctBy { it.artistId }
+                        .take(3)
+                        .toList()
+                }.getOrDefault(emptyList())
+            }
 
             if (holder.itemView.getTag(R.id.genre_artwork_tag) != genre.id) return@launch
             distinctArtistSongs.forEachIndexed { index, song ->
