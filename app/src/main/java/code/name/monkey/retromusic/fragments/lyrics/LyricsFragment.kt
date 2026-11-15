@@ -40,7 +40,6 @@ import code.name.monkey.retromusic.lyrics.model.LyricDocument
 import code.name.monkey.retromusic.lyrics.parser.LrcLyricsParser
 import code.name.monkey.retromusic.lyrics.parser.TtmlLyricsParser
 import code.name.monkey.retromusic.lyrics.translation.LyricsTranslationCache
-import code.name.monkey.retromusic.lyrics.translation.MlKitLyricsTranslator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
