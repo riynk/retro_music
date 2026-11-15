@@ -185,7 +185,6 @@ class KaraokeLyricsView @JvmOverloads constructor(
 
         value.lines.forEachIndexed { index, line ->
             val lyric = TextView(context).apply {
-                setLineSpacing(dp(style.lineSpacingDp).toFloat(), 1f)
                 setPadding(dp(12), dp(12), dp(12), dp(2))
                 isClickable = true
                 isFocusable = true
@@ -331,13 +330,17 @@ class KaraokeLyricsView @JvmOverloads constructor(
             lyric.alpha = targetAlpha
             lyric.translationY = 0f
         }
-        content.addView(
-            lyric,
-            LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT
-            )
-        )
+        val lyricLayoutParams = LinearLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT
+        ).apply {
+            bottomMargin = if (subtitle != null && (!compact || active)) {
+                0
+            } else {
+                dp(style.lineSpacingDp)
+            }
+        }
+        content.addView(lyric, lyricLayoutParams)
 
         // Keep the artwork readable: only the active line gets a translation
         // subtitle in the compact overlay. Full-page lyrics retain all subtitles.
@@ -349,13 +352,13 @@ class KaraokeLyricsView @JvmOverloads constructor(
                 subtitle.alpha = if (active) 0.9f else 0.42f
                 subtitle.translationY = 0f
             }
-            content.addView(
-                subtitle,
-                LinearLayout.LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT
-                )
-            )
+            val subtitleLayoutParams = LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = dp(style.lineSpacingDp)
+            }
+            content.addView(subtitle, subtitleLayoutParams)
         }
 
         if (compact) {
