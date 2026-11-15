@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import code.name.monkey.appthemehelper.ThemeStore
+import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
@@ -47,9 +48,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings), ColorCallback {
             }
         }
 
-        navController.addOnDestinationChangedListener { _, _, _ ->
-            binding.appBarLayout.title =
-                navController.currentDestination?.let { getStringFromDestination(it) }.toString()
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            binding.appBarLayout.title = arguments?.getString(MainActivity.SETTINGS_SCREEN_TITLE)
+                ?.takeIf { it.isNotBlank() }
+                ?: getStringFromDestination(destination)
         }
     }
 
