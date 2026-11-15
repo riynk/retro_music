@@ -301,10 +301,14 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
     }
 
     private fun showLyrics(visible: Boolean) {
+        val replaceCover = PreferenceUtil.lyricsType == CoverLyricsType.REPLACE_COVER
+        // The fading-edge layer belongs only to Replace Cover. Keep it out of
+        // Over Cover so it cannot add a second translucent rectangle over artwork.
+        binding.fadingEdgeLayout.isVisible = visible && replaceCover
         binding.coverLyrics.isVisible = false
         binding.lyricsView.isVisible = false
         binding.viewPager.isVisible = true
-        val lyrics: View = if (PreferenceUtil.lyricsType == CoverLyricsType.REPLACE_COVER) {
+        val lyrics: View = if (replaceCover) {
             ObjectAnimator.ofFloat(viewPager, View.ALPHA, if (visible) 0F else 1F).start()
             lrcView
         } else {

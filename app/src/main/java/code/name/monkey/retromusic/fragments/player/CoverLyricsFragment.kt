@@ -266,16 +266,10 @@ class CoverLyricsFragment : AbsMusicServiceFragment(R.layout.fragment_cover_lyri
             binding.playerLyrics.layoutParams = params
         }
 
-        val artworkContainer = artwork.parent as? View
         binding.playerLyrics.outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
-                val parentProvider = artworkContainer?.outlineProvider
-                if (artworkContainer != null && parentProvider != null) {
-                    parentProvider.getOutline(artworkContainer, outline)
-                } else {
-                    val radius = 12f * resources.displayMetrics.density
-                    outline.setRoundRect(0, 0, view.width, view.height, radius)
-                }
+                val radius = 12f * resources.displayMetrics.density
+                outline.setRoundRect(0, 0, view.width, view.height, radius)
             }
         }
         binding.playerLyrics.clipToOutline = true
