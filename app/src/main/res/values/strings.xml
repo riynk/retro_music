@@ -265,7 +265,7 @@
     <string name="permission_title">Storage Access</string>
     <string name="permissions_denied">Permissions denied.</string>
     <string name="personalize">Personalize</string>
-    <string name="personalize_settings_summary">Customize your now playing and UI controls</string>
+    <string name="personalize_settings_summary">Customize the home, library, artwork and lock screen</string>
     <string name="pick_from_local_storage">Pick from local storage</string>
     <string name="pinterest_page">Pinterest</string>
     <string name="pinterest_page_summary">Follow Pinterest page for Retro Music design inspiration</string>
@@ -551,6 +551,8 @@
     <string name="pref_lyrics_text_size">Text size (sp)</string>
     <string name="pref_lyrics_font_family">Font family</string>
     <string name="pref_lyrics_alignment">Text alignment</string>
+    <string name="pref_lyrics_line_spacing">Line spacing (dp)</string>
+    <string name="pref_lyrics_line_spacing_summary">Adjust the vertical space between lyric lines</string>
     <string name="pref_lyrics_visible_lines">Visible lyric lines</string>
     <string name="pref_lyrics_visible_lines_summary">Choose how many lyric lines appear over the album cover</string>
     <string name="lyrics_translation_loading">Preparing the offline translation model…</string>
