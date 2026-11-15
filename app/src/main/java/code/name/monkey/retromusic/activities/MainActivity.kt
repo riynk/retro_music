@@ -110,13 +110,15 @@ class MainActivity : AbsCastActivity(), PreferenceFragmentCompat.OnPreferenceSta
                     Gravity.CENTER
                 ).apply { topMargin = (142 * density).toInt() }
             )
-            provider.iconView.animate()
-                .alpha(0f)
-                .rotation(10f)
-                .scaleX(1.12f)
-                .scaleY(1.12f)
-                .setDuration(620L)
-                .start()
+            // Android 16 can dispatch the splash exit callback after its icon view
+            // has already been detached. Access the optional icon defensively.
+            runCatching { provider.iconView }.getOrNull()?.animate()
+                ?.alpha(0f)
+                ?.rotation(10f)
+                ?.scaleX(1.12f)
+                ?.scaleY(1.12f)
+                ?.setDuration(620L)
+                ?.start()
             brand.animate()
                 .alpha(1f)
                 .translationY((-6 * density))
