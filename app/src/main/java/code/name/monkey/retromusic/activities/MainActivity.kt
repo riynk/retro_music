@@ -20,9 +20,15 @@ import android.os.Bundle
 import android.provider.MediaStore
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.contains
+import androidx.navigation.fragment.NavHostFragment
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceScreen
 import androidx.navigation.ui.setupWithNavController
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.base.AbsCastActivity
+import code.name.monkey.retromusic.fragments.settings.NowPlayingSettingsFragment
+import code.name.monkey.retromusic.fragments.settings.OtherSettingsFragment
+import code.name.monkey.retromusic.fragments.settings.PersonalizeSettingsFragment
 import code.name.monkey.retromusic.extensions.*
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.SearchQueryHelper.getSongs
@@ -38,10 +44,29 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 
-class MainActivity : AbsCastActivity() {
+class MainActivity : AbsCastActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
     companion object {
         const val TAG = "MainActivity"
         const val EXPAND_PANEL = "expand_panel"
+        const val SETTINGS_SCREEN_TITLE = "settings_screen_title"
+    }
+
+    override fun onPreferenceStartScreen(
+        caller: PreferenceFragmentCompat,
+        preferenceScreen: PreferenceScreen
+    ): Boolean {
+        val action = when (caller) {
+            is PersonalizeSettingsFragment -> R.id.action_personalizeSettingsFragment_to_subscreen
+            is NowPlayingSettingsFragment -> R.id.action_nowPlayingSettingsFragment_to_subscreen
+            is OtherSettingsFragment -> R.id.action_otherSettingsFragment_to_subscreen
+            else -> return false
+        }
+        val arguments = Bundle().apply {
+            putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.key)
+            putString(SETTINGS_SCREEN_TITLE, preferenceScreen.title?.toString())
+        }
+        NavHostFragment.findNavController(caller).navigate(action, arguments)
+        return true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
