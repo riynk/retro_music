@@ -535,7 +535,9 @@
     <string name="listing_files" translatable="false" />
 
 
-    <string name="pref_header_lyrics">Lyrics and translation</string>
+    <string name="pref_header_lyrics">Lyrics playback</string>
+    <string name="pref_header_lyrics_behavior">Lyrics behavior</string>
+    <string name="pref_header_lyrics_translation">Translation</string>
     <string name="pref_lyrics_word_highlight">Word-by-word highlighting</string>
     <string name="pref_lyrics_word_highlight_summary">Highlight timed words when the lyric file contains word-level timestamps</string>
     <string name="pref_lyrics_translation">Show translation</string>
