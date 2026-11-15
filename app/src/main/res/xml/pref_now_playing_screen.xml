@@ -37,44 +37,52 @@
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_header_lyrics">
 
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
-        android:icon="@drawable/ic_lyrics"
-        android:defaultValue="0"
-        android:entries="@array/pref_lyrics_type_entries"
-        android:entryValues="@array/pref_lyrics_type_values"
-        android:key="lyrics_type"
-        android:layout="@layout/list_item_view"
-        android:title="@string/pref_title_lyrics_type"
-        android:summary="@string/pref_summary_lyrics_type" />
-
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
-        android:icon="@drawable/ic_screen_lock_portrait"
-        android:defaultValue="false"
-        android:key="screen_on_lyrics"
-        android:layout="@layout/list_item_view_switch"
-        android:summary="@string/pref_keep_screen_on_summary"
-        android:title="@string/pref_title_lyrics_screen_on" />
-
-
-        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
-            android:icon="@drawable/ic_lyrics_outline"
-            android:defaultValue="true"
-            android:key="lyrics_word_highlight"
-            android:layout="@layout/list_item_view_switch"
-            android:summary="@string/pref_lyrics_word_highlight_summary"
-            android:title="@string/pref_lyrics_word_highlight" />
-
-    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
-        android:icon="@drawable/ic_language"
-            android:defaultValue="id"
-            android:entries="@array/pref_lyrics_language_names"
-            android:entryValues="@array/pref_lyrics_language_codes"
-            android:key="lyrics_translation_language"
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+            android:icon="@drawable/ic_lyrics"
+            android:defaultValue="0"
+            android:entries="@array/pref_lyrics_type_entries"
+            android:entryValues="@array/pref_lyrics_type_values"
+            android:key="lyrics_type"
             android:layout="@layout/list_item_view"
-            android:title="@string/pref_lyrics_translation_language" 
-            android:summary="@string/pref_lyrics_translation_language_summary"/>
-    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+            android:title="@string/pref_title_lyrics_type"
+            android:summary="@string/pref_summary_lyrics_type" />
 
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+            android:layout="@layout/preference_category_title"
+            android:title="@string/pref_header_lyrics_behavior">
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+                android:icon="@drawable/ic_lyrics_outline"
+                android:defaultValue="true"
+                android:key="lyrics_word_highlight"
+                android:layout="@layout/list_item_view_switch"
+                android:summary="@string/pref_lyrics_word_highlight_summary"
+                android:title="@string/pref_lyrics_word_highlight" />
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+                android:icon="@drawable/ic_screen_lock_portrait"
+                android:defaultValue="false"
+                android:key="screen_on_lyrics"
+                android:layout="@layout/list_item_view_switch"
+                android:summary="@string/pref_keep_screen_on_summary"
+                android:title="@string/pref_title_lyrics_screen_on" />
+        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+
+        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
+            android:layout="@layout/preference_category_title"
+            android:title="@string/pref_header_lyrics_translation">
+
+            <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+                android:icon="@drawable/ic_language"
+                android:defaultValue="id"
+                android:entries="@array/pref_lyrics_language_names"
+                android:entryValues="@array/pref_lyrics_language_codes"
+                android:key="lyrics_translation_language"
+                android:layout="@layout/list_item_view"
+                android:title="@string/pref_lyrics_translation_language"
+                android:summary="@string/pref_lyrics_translation_language_summary" />
+        </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
+    </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
 
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
